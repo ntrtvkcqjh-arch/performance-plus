@@ -9,17 +9,17 @@
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --g:#D4AF6E;--g2:#EDD68C;--g-dim:rgba(212,175,110,.12);--g-glow:rgba(212,175,110,.08);
-  --t:#FAF7F2;--t2:rgba(250,247,242,.5);--t3:rgba(250,247,242,.2);
-  --b:rgba(255,255,255,.08);--bg:rgba(212,175,110,.18);
-  --s1:rgba(255,255,255,.025);--s2:rgba(255,255,255,.05);
+  --g:#D4AF6E;--g2:#EDD68C;--g-dim:rgba(212,175,110,.14);--g-glow:rgba(212,175,110,.1);
+  --t:#FAF7F2;--t2:rgba(250,247,242,.6);--t3:rgba(250,247,242,.28);
+  --b:rgba(255,255,255,.1);--bg:rgba(212,175,110,.22);
+  --s1:rgba(255,255,255,.05);--s2:rgba(255,255,255,.09);
   --green:#5AE68A;--green-d:rgba(90,230,138,.08);
-  --bg-base:#0C0A07;
+  --bg-base:#1A1713;
 }
 html,body{height:100%;background:var(--bg-base);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;color:var(--t);overflow:hidden;-webkit-font-smoothing:antialiased}
 
 /* AMBIENT GLOW */
-body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 100% 55% at 50% -5%,rgba(50,32,8,.9) 0%,transparent 70%)}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 130% 50% at 50% -8%,rgba(90,55,10,.75) 0%,transparent 60%)}
 
 /* CANVAS */
 #cv{position:fixed;inset:0;z-index:0;pointer-events:none}
@@ -72,7 +72,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 #s-session{z-index:20;background:var(--bg-base)}
 
 /* NAVBAR */
-.nb{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;padding-top:env(safe-area-inset-top,0);flex-shrink:0;border-bottom:1px solid var(--b);background:rgba(12,10,7,.7);backdrop-filter:blur(40px);position:relative;z-index:10}
+.nb{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;padding-top:env(safe-area-inset-top,0);flex-shrink:0;border-bottom:1px solid var(--b);background:rgba(26,23,19,.82);backdrop-filter:blur(40px);position:relative;z-index:10}
 .nb-mark{font-size:11px;font-weight:700;letter-spacing:.22em;color:var(--g);text-transform:uppercase}
 .nb-title{position:absolute;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--t2);pointer-events:none;white-space:nowrap}
 .nb-back{display:flex;align-items:center;gap:4px;background:none;border:none;cursor:pointer;color:var(--g);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-family:inherit;padding:8px 0;transition:opacity .2s}
@@ -84,20 +84,25 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .sc::-webkit-scrollbar{display:none}
 
 /* HERO */
-.hero{padding:32px 24px 26px;border-bottom:1px solid var(--b)}
-.hero-ey{font-size:9px;font-weight:700;letter-spacing:.28em;color:var(--g);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px}
-.hero-ey::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--bg),transparent)}
-.hero-name{font-size:38px;font-weight:100;letter-spacing:.02em;line-height:1.05;margin-bottom:8px;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;color:var(--t)}
-.hero-date{font-size:11px;color:var(--t2);letter-spacing:.07em;margin-bottom:18px}
-.hero-links{display:flex;gap:16px;flex-wrap:wrap}
-.hero-link{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--g);text-decoration:none;border-bottom:1px solid var(--bg);padding-bottom:2px;transition:all .2s}
-.hero-link:active{color:var(--g2)}
+.hero{padding:28px 22px 26px;border-bottom:1px solid var(--b)}
+.hero-top{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.hero-av{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,rgba(212,175,110,.18),rgba(212,175,110,.06));border:1px solid rgba(212,175,110,.28);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--g);letter-spacing:.04em;flex-shrink:0}
+.hero-info{display:flex;flex-direction:column;gap:3px}
+.hero-tag{font-size:9px;font-weight:700;letter-spacing:.28em;color:var(--g);text-transform:uppercase}
+.hero-brand{font-size:11px;color:var(--t2);letter-spacing:.06em}
+.hero-name{font-size:40px;font-weight:100;letter-spacing:.01em;line-height:1.02;margin-bottom:10px;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif}
+.hero-name strong{display:block;font-weight:600;color:var(--t)}
+.hero-date{font-size:11px;color:var(--t2);letter-spacing:.05em;margin-bottom:20px}
+.hero-date b{color:var(--t);font-weight:500}
+.hero-links{display:flex;gap:9px;flex-wrap:wrap}
+.hero-link{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g);text-decoration:none;background:rgba(212,175,110,.09);border:1px solid rgba(212,175,110,.22);border-radius:20px;padding:7px 15px;transition:all .22s cubic-bezier(.2,.8,.3,1)}
+.hero-link:active{background:rgba(212,175,110,.18);transform:scale(.97)}
 
 /* METRICS */
-.metrics{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--b);flex-shrink:0}
-.met{padding:18px 6px;text-align:center;border-right:1px solid var(--b)}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--b);flex-shrink:0;background:rgba(255,255,255,.02)}
+.met{padding:20px 6px;text-align:center;border-right:1px solid var(--b)}
 .met:last-child{border-right:none}
-.met-v{font-size:26px;font-weight:100;letter-spacing:-.5px;line-height:1;margin-bottom:5px;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;font-variant-numeric:tabular-nums}
+.met-v{font-size:27px;font-weight:100;letter-spacing:-.5px;line-height:1;margin-bottom:6px;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;font-variant-numeric:tabular-nums}
 .met-l{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--t2)}
 
 /* SECTION */
@@ -114,7 +119,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .ph-mini-fill{position:absolute;top:0;left:0;height:1px;transition:width 1.2s cubic-bezier(.2,.8,.3,1)}
 
 /* NEXT CARD */
-.next-card{background:var(--s1);border:1px solid var(--b);border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:all .22s cubic-bezier(.2,.8,.3,1);position:relative;overflow:hidden}
+.next-card{background:var(--s1);border:1px solid var(--b);border-radius:18px;padding:18px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:all .22s cubic-bezier(.2,.8,.3,1);position:relative;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.18)}
 .next-card:active{transform:scale(.98);background:var(--s2)}
 .next-ic{width:42px;height:42px;border-radius:11px;border:1px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:var(--g-dim)}
 .next-body{flex:1;min-width:0}
@@ -154,7 +159,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 
 /* PROG TILES */
 .prog-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.prog-tile{background:var(--s1);border:1px solid var(--b);border-radius:16px;padding:20px 16px;cursor:pointer;transition:all .22s cubic-bezier(.2,.8,.3,1)}
+.prog-tile{background:var(--s1);border:1px solid var(--b);border-radius:20px;padding:20px 16px;cursor:pointer;transition:all .22s cubic-bezier(.2,.8,.3,1);box-shadow:0 2px 14px rgba(0,0,0,.15)}
 .prog-tile:active{transform:scale(.97);background:var(--s2)}
 .prog-tile-ic{font-size:28px;margin-bottom:12px}
 .prog-tile-name{font-size:14px;font-weight:500;letter-spacing:.02em;margin-bottom:4px}
@@ -222,7 +227,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .coach-link{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--g);text-decoration:none;border-bottom:1px solid var(--bg);padding-bottom:2px}
 
 /* TABBAR */
-.tabbar{background:rgba(12,10,7,.92);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border-top:1px solid var(--b);display:flex;padding:10px 0;padding-bottom:max(env(safe-area-inset-bottom,0px),10px);flex-shrink:0;z-index:5}
+.tabbar{background:rgba(26,23,19,.94);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border-top:1px solid var(--b);display:flex;padding:10px 0;padding-bottom:max(env(safe-area-inset-bottom,0px),10px);flex-shrink:0;z-index:5}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:none;cursor:pointer;padding:4px 0;font-family:inherit;transition:all .2s}
 .tab-dot{width:4px;height:4px;border-radius:50%;background:var(--t3);transition:all .3s cubic-bezier(.2,.8,.3,1)}
 .tab.on .tab-dot{background:var(--g);box-shadow:0 0 8px rgba(212,175,110,.6);transform:scale(1.4)}
@@ -262,12 +267,18 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
       <div class="nb"><div class="nb-mark">P+</div><div class="nb-sp"></div></div>
       <div class="sc">
         <div class="hero">
-          <div class="hero-ey">Client</div>
-          <div class="hero-name">Marjana<br>Houloud</div>
-          <div class="hero-date">Début · 25 mai 2026</div>
+          <div class="hero-top">
+            <div class="hero-av">MH</div>
+            <div class="hero-info">
+              <div class="hero-tag">Coaching Personnalisé</div>
+              <div class="hero-brand">Performance Plus</div>
+            </div>
+          </div>
+          <div class="hero-name">Marjana<br><strong>Houloud</strong></div>
+          <div class="hero-date">Programme débuté le <b>25 mai 2026</b></div>
           <div class="hero-links">
-            <a class="hero-link" href="https://docs.google.com/document/d/1tys6hyZD2eY9rp23McWszw6R8ftYqXvXE8Pan1GedlA/edit?tab=t.0" target="_blank">Contrat</a>
-            <a class="hero-link" href="https://youtu.be/I-ZyNX-SFTo" target="_blank">Programme vidéo</a>
+            <a class="hero-link" href="https://docs.google.com/document/d/1tys6hyZD2eY9rp23McWszw6R8ftYqXvXE8Pan1GedlA/edit?tab=t.0" target="_blank">↗ Contrat</a>
+            <a class="hero-link" href="https://youtu.be/I-ZyNX-SFTo" target="_blank">↗ Programme vidéo</a>
           </div>
         </div>
         <div class="metrics">
