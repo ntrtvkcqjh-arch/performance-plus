@@ -24,28 +24,34 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 /* CANVAS */
 #cv{position:fixed;inset:0;z-index:0;pointer-events:none}
 
-/* AUTH */
-#auth{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 32px;background:var(--bg-base);overflow:hidden}
-#auth::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent,rgba(212,175,110,.03) 50%,transparent);animation:scan 10s ease-in-out infinite;pointer-events:none}
-@keyframes scan{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
-.a-tag{font-size:10px;font-weight:700;letter-spacing:.3em;color:var(--g);text-transform:uppercase;margin-bottom:28px;animation:fadeUp .9s ease both;display:flex;align-items:center;gap:10px}
-.a-tag::before,.a-tag::after{content:'';width:24px;height:1px;background:var(--bg)}
-.a-logo{font-size:46px;font-weight:100;letter-spacing:.06em;text-align:center;line-height:1.05;margin-bottom:8px;animation:fadeUp .9s .08s ease both;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif}
-.a-logo b{font-weight:600;background:linear-gradient(135deg,var(--g),var(--g2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.a-sub{font-size:11px;color:var(--t2);letter-spacing:.14em;text-transform:uppercase;margin-bottom:56px;animation:fadeUp .9s .16s ease both}
-.a-form{width:100%;max-width:280px;animation:fadeUp .9s .24s ease both}
-.a-inp{width:100%;background:none;border:none;border-bottom:1px solid var(--b);outline:none;padding:14px 0;font-size:16px;color:var(--t);letter-spacing:.18em;text-align:center;font-family:inherit;transition:border-color .35s;display:block;margin-bottom:20px}
-.a-inp:focus{border-bottom-color:var(--g)}
-.a-inp::placeholder{color:var(--t3);letter-spacing:.06em;font-size:13px}
-.a-btn{display:block;width:100%;background:none;border:1px solid var(--bg);border-radius:2px;padding:15px;font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--g);cursor:pointer;font-family:inherit;transition:all .3s;position:relative;overflow:hidden}
-.a-btn::before{content:'';position:absolute;inset:0;background:var(--g-dim);transform:scaleX(0);transform-origin:left;transition:transform .4s cubic-bezier(.2,.8,.3,1)}
-.a-btn:hover::before,.a-btn:active::before{transform:scaleX(1)}
-.a-btn span{position:relative;z-index:1}
-.a-err{margin-top:14px;font-size:11px;letter-spacing:.06em;color:rgba(240,100,80,.7);text-align:center;min-height:14px}
+/* ─── SPLASH ─── */
+#splash{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#020100;cursor:pointer;transition:opacity .7s cubic-bezier(.4,0,.2,1),transform .7s cubic-bezier(.4,0,.2,1);will-change:opacity,transform}
+#splash.gone{opacity:0;transform:scale(1.06) translateY(-10px);pointer-events:none}
+.sp-ey{font-size:9px;font-weight:700;letter-spacing:.38em;color:var(--g);text-transform:uppercase;margin-bottom:40px;opacity:0;animation:fadeUp .7s .1s ease both}
+.sp-ttl{font-size:clamp(54px,14vw,82px);font-weight:100;letter-spacing:.05em;line-height:.92;text-align:center;margin-bottom:22px;opacity:0;animation:fadeUp .85s .28s ease both;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif}
+.sp-ttl b{display:block;font-weight:600;background:linear-gradient(135deg,var(--g) 0%,var(--g2) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sp-client{font-size:11px;color:var(--t2);letter-spacing:.14em;text-transform:uppercase;opacity:0;animation:fadeUp .7s .48s ease both}
+.sp-hint{position:absolute;bottom:max(env(safe-area-inset-bottom,0px),40px);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);opacity:0;animation:fadeUp .55s 1.9s ease both,blink 2.4s 2.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:.25}50%{opacity:.65}}
+
+/* ─── AUTH (iPhone lock) ─── */
+#auth{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 32px;opacity:0;pointer-events:none;transform:translateY(30px);transition:opacity .52s cubic-bezier(.25,.8,.25,1),transform .52s cubic-bezier(.25,.8,.25,1);will-change:opacity,transform}
+#auth.on{opacity:1;pointer-events:auto;transform:translateY(0)}
+#auth.off{opacity:0;transform:scale(.96) translateY(-18px);transition-duration:.38s}
+.lock-name{font-size:clamp(40px,11vw,58px);font-weight:100;letter-spacing:.03em;text-align:center;line-height:1.05;margin-bottom:52px;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;color:var(--t)}
+.lock-card{width:100%;max-width:298px;background:rgba(252,249,245,.97);border-radius:24px;padding:28px 22px 24px;box-shadow:0 28px 90px rgba(0,0,0,.75),0 0 0 .5px rgba(255,255,255,.12)}
+.lock-inp{width:100%;background:rgba(0,0,0,.07);border:none;border-radius:13px;outline:none;padding:15px 16px;font-size:16px;color:#100e0b;letter-spacing:.24em;text-align:center;font-family:inherit;margin-bottom:11px;display:block;-webkit-appearance:none;transition:background .2s}
+.lock-inp:focus{background:rgba(0,0,0,.1)}
+.lock-inp::placeholder{color:rgba(16,14,11,.28);letter-spacing:.07em;font-size:13px}
+.lock-inp.shake{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
+.lock-btn{display:block;width:100%;background:#100e0b;border:none;border-radius:13px;padding:15px;font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--g);cursor:pointer;font-family:inherit;transition:opacity .15s,transform .15s}
+.lock-btn:active{opacity:.72;transform:scale(.98)}
+.a-err{margin-top:16px;font-size:11px;letter-spacing:.07em;color:rgba(228,75,55,.85);text-align:center;min-height:16px}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 
 /* APP */
-#app{display:none;height:100%;flex-direction:column;position:relative;z-index:1}
-#app.on{display:flex}
+#app{height:100%;flex-direction:column;position:relative;z-index:1;display:flex;opacity:0;pointer-events:none;transform:scale(.985);transition:opacity .6s .06s cubic-bezier(.25,.8,.25,1),transform .6s .06s cubic-bezier(.25,.8,.25,1)}
+#app.on{opacity:1;pointer-events:auto;transform:scale(1)}
 
 /* SCREENS WRAP — all screens stack here */
 .sw{flex:1;position:relative;overflow:hidden}
@@ -229,14 +235,20 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 <body>
 <canvas id="cv"></canvas>
 
-<!-- AUTH -->
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-ey">Performance Plus</div>
+  <div class="sp-ttl">Coaching<br><b>Calisthénie</b></div>
+  <div class="sp-client">Marjana Houloud · 2026</div>
+  <div class="sp-hint">Appuyer pour continuer</div>
+</div>
+
+<!-- AUTH (iPhone lock) -->
 <div id="auth">
-  <div class="a-tag">Performance Plus</div>
-  <div class="a-logo">Coaching<br><b>Calisthénie</b></div>
-  <div class="a-sub">Accès privé · Marjana Houloud</div>
-  <div class="a-form">
-    <input id="pwd" class="a-inp" type="password" placeholder="mot de passe" autocomplete="current-password"/>
-    <button class="a-btn" onclick="login()"><span>Accéder →</span></button>
+  <div class="lock-name">Marjana<br>Houloud</div>
+  <div class="lock-card">
+    <input id="pwd" class="lock-inp" type="password" placeholder="mot de passe" autocomplete="current-password"/>
+    <button class="lock-btn" onclick="login()">Déverrouiller →</button>
   </div>
   <div class="a-err" id="a-err"></div>
 </div>
@@ -412,18 +424,39 @@ const ls=k=>localStorage.getItem(k);
 const ss=(k,v)=>localStorage.setItem(k,v);
 const tx=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t};
 
-/* AUTH */
+/* AUTH FLOW */
+let splashDone=false;
+function showAuth(){
+  if(splashDone)return;
+  splashDone=true;
+  document.getElementById('splash').classList.add('gone');
+  setTimeout(()=>{
+    document.getElementById('auth').classList.add('on');
+    document.getElementById('pwd').focus();
+  },320);
+}
+setTimeout(showAuth,2800);
+document.getElementById('splash').addEventListener('click',showAuth);
+
 document.getElementById('pwd').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
 function login(){
-  if(document.getElementById('pwd').value===PWD){
-    document.getElementById('auth').style.display='none';
-    document.getElementById('app').classList.add('on');
+  const inp=document.getElementById('pwd');
+  if(inp.value===PWD){
+    const auth=document.getElementById('auth');
+    auth.classList.add('off');
     buildAll();
+    setTimeout(()=>{
+      auth.style.display='none';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        document.getElementById('app').classList.add('on');
+      }));
+    },360);
   } else {
     const e=document.getElementById('a-err');
     e.textContent='Accès refusé.';
-    document.getElementById('pwd').value='';
-    setTimeout(()=>e.textContent='',2500);
+    inp.classList.add('shake');
+    inp.value='';
+    setTimeout(()=>{inp.classList.remove('shake');e.textContent='';},2500);
   }
 }
 
