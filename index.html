@@ -9,20 +9,24 @@
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --g:#C9A86C;--g2:#E8C98A;--g-dim:rgba(201,168,108,.10);--g-glow:rgba(201,168,108,.06);
-  --t:#F0EDE8;--t2:rgba(240,237,232,.45);--t3:rgba(240,237,232,.18);
-  --b:rgba(255,255,255,.07);--bg:rgba(201,168,108,.14);
-  --s1:rgba(255,255,255,.02);--s2:rgba(255,255,255,.04);
-  --green:#4ADE80;--green-d:rgba(74,222,128,.08);
+  --g:#D4AF6E;--g2:#EDD68C;--g-dim:rgba(212,175,110,.12);--g-glow:rgba(212,175,110,.08);
+  --t:#FAF7F2;--t2:rgba(250,247,242,.5);--t3:rgba(250,247,242,.2);
+  --b:rgba(255,255,255,.08);--bg:rgba(212,175,110,.18);
+  --s1:rgba(255,255,255,.025);--s2:rgba(255,255,255,.05);
+  --green:#5AE68A;--green-d:rgba(90,230,138,.08);
+  --bg-base:#0C0A07;
 }
-html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;color:var(--t);overflow:hidden;-webkit-font-smoothing:antialiased}
+html,body{height:100%;background:var(--bg-base);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;color:var(--t);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+/* AMBIENT GLOW */
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 100% 55% at 50% -5%,rgba(50,32,8,.9) 0%,transparent 70%)}
 
 /* CANVAS */
 #cv{position:fixed;inset:0;z-index:0;pointer-events:none}
 
 /* AUTH */
-#auth{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 32px;background:#000;overflow:hidden}
-#auth::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent,rgba(201,168,108,.025) 50%,transparent);animation:scan 10s ease-in-out infinite;pointer-events:none}
+#auth{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 32px;background:var(--bg-base);overflow:hidden}
+#auth::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent,rgba(212,175,110,.03) 50%,transparent);animation:scan 10s ease-in-out infinite;pointer-events:none}
 @keyframes scan{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
 .a-tag{font-size:10px;font-weight:700;letter-spacing:.3em;color:var(--g);text-transform:uppercase;margin-bottom:28px;animation:fadeUp .9s ease both;display:flex;align-items:center;gap:10px}
 .a-tag::before,.a-tag::after{content:'';width:24px;height:1px;background:var(--bg)}
@@ -37,32 +41,47 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
 .a-btn::before{content:'';position:absolute;inset:0;background:var(--g-dim);transform:scaleX(0);transform-origin:left;transition:transform .4s cubic-bezier(.2,.8,.3,1)}
 .a-btn:hover::before,.a-btn:active::before{transform:scaleX(1)}
 .a-btn span{position:relative;z-index:1}
-.a-err{margin-top:14px;font-size:11px;letter-spacing:.06em;color:rgba(240,100,80,.65);text-align:center;min-height:14px}
+.a-err{margin-top:14px;font-size:11px;letter-spacing:.06em;color:rgba(240,100,80,.7);text-align:center;min-height:14px}
 
 /* APP */
 #app{display:none;height:100%;flex-direction:column;position:relative;z-index:1}
 #app.on{display:flex}
-.screen{display:none;flex:1;flex-direction:column;overflow:hidden}.screen.on{display:flex}
+
+/* SCREENS WRAP — all screens stack here */
+.sw{flex:1;position:relative;overflow:hidden}
+
+/* SCREENS — opacity transitions, all always rendered */
+.screen{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;overflow:hidden;
+  opacity:0;pointer-events:none;
+  transform:translateY(10px);
+  transition:opacity .32s cubic-bezier(.25,.8,.25,1), transform .32s cubic-bezier(.25,.8,.25,1);
+  will-change:opacity,transform;
+}
+.screen.on{opacity:1;pointer-events:auto;transform:translateY(0)}
+.screen.out{opacity:0;transform:translateY(-6px)}
+
+/* SESSION OVERLAY — on top of everything */
+#s-session{z-index:20;background:var(--bg-base)}
 
 /* NAVBAR */
-.nb{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;padding-top:env(safe-area-inset-top,0);flex-shrink:0;border-bottom:1px solid var(--b);background:rgba(0,0,0,.65);backdrop-filter:blur(40px);position:relative;z-index:10}
+.nb{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;padding-top:env(safe-area-inset-top,0);flex-shrink:0;border-bottom:1px solid var(--b);background:rgba(12,10,7,.7);backdrop-filter:blur(40px);position:relative;z-index:10}
 .nb-mark{font-size:11px;font-weight:700;letter-spacing:.22em;color:var(--g);text-transform:uppercase}
 .nb-title{position:absolute;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--t2);pointer-events:none;white-space:nowrap}
-.nb-back{display:flex;align-items:center;gap:4px;background:none;border:none;cursor:pointer;color:var(--g);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-family:inherit;padding:8px 0}
+.nb-back{display:flex;align-items:center;gap:4px;background:none;border:none;cursor:pointer;color:var(--g);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-family:inherit;padding:8px 0;transition:opacity .2s}
+.nb-back:active{opacity:.6}
 .nb-sp{width:60px}
 
 /* SCROLL */
 .sc{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:max(env(safe-area-inset-bottom,0px),80px)}
 .sc::-webkit-scrollbar{display:none}
 
-/* DIVIDER LINE */
-.line{height:1px;background:var(--b)}
-
 /* HERO */
 .hero{padding:32px 24px 26px;border-bottom:1px solid var(--b)}
 .hero-ey{font-size:9px;font-weight:700;letter-spacing:.28em;color:var(--g);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px}
 .hero-ey::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--bg),transparent)}
-.hero-name{font-size:38px;font-weight:100;letter-spacing:.02em;line-height:1.05;margin-bottom:8px;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;background:linear-gradient(140deg,var(--t) 50%,var(--t2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-name{font-size:38px;font-weight:100;letter-spacing:.02em;line-height:1.05;margin-bottom:8px;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;color:var(--t)}
 .hero-date{font-size:11px;color:var(--t2);letter-spacing:.07em;margin-bottom:18px}
 .hero-links{display:flex;gap:16px;flex-wrap:wrap}
 .hero-link{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--g);text-decoration:none;border-bottom:1px solid var(--bg);padding-bottom:2px;transition:all .2s}
@@ -80,15 +99,13 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
 .sect-lbl{font-size:9px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--t3);margin-bottom:16px;display:flex;align-items:center;gap:10px}
 .sect-lbl::after{content:'';flex:1;height:1px;background:var(--b)}
 
-/* PHASE MINI */
+/* PHASE MINI (home) */
 .ph-mini{margin-bottom:14px}
 .ph-mini-row{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
 .ph-mini-name{font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--t2);text-transform:uppercase}
 .ph-mini-ct{font-size:10px;color:var(--t3);margin-left:auto;font-variant-numeric:tabular-nums}
-.ph-mini-track{height:1px;background:var(--b);position:relative;overflow:visible}
-.ph-mini-fill{position:absolute;top:0;left:0;height:100%;transition:width 1.2s cubic-bezier(.2,.8,.3,1)}
-.ph-mini-dot{position:absolute;right:-2px;top:-2px;width:5px;height:5px;border-radius:50%;background:currentColor;box-shadow:0 0 6px currentColor;opacity:0;transition:opacity .5s}
-.ph-mini-fill:not([style*="width: 0"]) .ph-mini-dot,.ph-mini-fill:not([style*="width:0"]) + .ph-mini-dot{opacity:1}
+.ph-mini-track{height:1px;background:var(--b);position:relative}
+.ph-mini-fill{position:absolute;top:0;left:0;height:1px;transition:width 1.2s cubic-bezier(.2,.8,.3,1)}
 
 /* NEXT CARD */
 .next-card{background:var(--s1);border:1px solid var(--b);border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:all .22s cubic-bezier(.2,.8,.3,1);position:relative;overflow:hidden}
@@ -112,24 +129,26 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
 .ph-info-sub{font-size:10px;color:var(--t3);letter-spacing:.05em}
 .ph-ct{font-size:11px;font-weight:600;color:var(--t3);font-variant-numeric:tabular-nums;transition:color .35s}
 .ph-card.open .ph-ct{color:var(--g)}
-.ph-chev{font-size:14px;color:var(--t3);margin-left:10px;transition:transform .3s cubic-bezier(.2,.8,.3,1),color .35s}
+.ph-chev{font-size:14px;color:var(--t3);margin-left:10px;transition:transform .35s cubic-bezier(.2,.8,.3,1),color .35s}
 .ph-card.open .ph-chev{transform:rotate(90deg);color:var(--g)}
 .ph-track{height:1px;background:var(--b);margin:0 24px}
 .ph-fill{height:100%;transition:width 1s cubic-bezier(.2,.8,.3,1)}
-.ph-objs{display:none;flex-direction:column;padding:0 24px}
-.ph-card.open .ph-objs{display:flex}
+
+/* PHASE OBJECTIVES */
+.ph-objs{overflow:hidden;max-height:0;transition:max-height .45s cubic-bezier(.2,.8,.3,1);padding:0 24px}
+.ph-card.open .ph-objs{max-height:600px}
 .obj-row{display:flex;align-items:flex-start;gap:14px;padding:13px 0;border-bottom:1px solid var(--b);cursor:pointer;user-select:none;transition:opacity .2s}
 .obj-row:last-child{border-bottom:none}
 .obj-row:active{opacity:.55}
 .obj-dot{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--b);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-size:9px;transition:all .3s cubic-bezier(.2,.8,.3,1)}
-.obj-row.done .obj-dot{background:var(--g);border-color:var(--g);box-shadow:0 0 10px rgba(201,168,108,.3);color:#000}
+.obj-row.done .obj-dot{background:var(--g);border-color:var(--g);box-shadow:0 0 10px rgba(212,175,110,.3);color:#000}
 .obj-txt{font-size:13px;color:var(--t2);line-height:1.55;flex:1;transition:color .3s}
 .obj-row.done .obj-txt{color:var(--t3);text-decoration:line-through;text-decoration-color:var(--t3)}
 .obj-empty{font-size:11px;color:var(--t3);padding:11px 0;letter-spacing:.05em;text-align:center}
 
 /* PROG TILES */
 .prog-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.prog-tile{background:var(--s1);border:1px solid var(--b);border-radius:16px;padding:20px 16px;cursor:pointer;transition:all .22s cubic-bezier(.2,.8,.3,1);position:relative;overflow:hidden}
+.prog-tile{background:var(--s1);border:1px solid var(--b);border-radius:16px;padding:20px 16px;cursor:pointer;transition:all .22s cubic-bezier(.2,.8,.3,1)}
 .prog-tile:active{transform:scale(.97);background:var(--s2)}
 .prog-tile-ic{font-size:28px;margin-bottom:12px}
 .prog-tile-name{font-size:14px;font-weight:500;letter-spacing:.02em;margin-bottom:4px}
@@ -140,28 +159,28 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
 
 /* SESSION LIST */
 .back-row{padding:18px 24px 6px;display:flex;align-items:center}
-.back-btn{background:none;border:none;cursor:pointer;color:var(--g);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;font-family:inherit;padding:0}
+.back-btn{background:none;border:none;cursor:pointer;color:var(--g);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;font-family:inherit;padding:0;transition:opacity .2s}
+.back-btn:active{opacity:.6}
 .sess-row{display:flex;align-items:center;padding:20px 24px;border-bottom:1px solid var(--b);gap:16px;cursor:pointer;transition:background .2s;user-select:none}
 .sess-row:first-of-type{border-top:1px solid var(--b)}
 .sess-row:active{background:var(--s1)}
-.sess-row.done{opacity:.48}
+.sess-row.done{opacity:.45}
 .sess-n{font-size:32px;font-weight:100;color:var(--t3);min-width:36px;font-variant-numeric:tabular-nums;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;line-height:1;transition:color .3s}
 .sess-row.done .sess-n{color:var(--g)}
 .sess-body{flex:1}
 .sess-name{font-size:14px;font-weight:500;margin-bottom:3px}
 .sess-sub{font-size:11px;color:var(--t2);letter-spacing:.03em}
 .sess-check{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--b);display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;transition:all .3s}
-.sess-row.done .sess-check{background:var(--g);border-color:var(--g);color:#000;box-shadow:0 0 10px rgba(201,168,108,.25)}
+.sess-row.done .sess-check{background:var(--g);border-color:var(--g);color:#000;box-shadow:0 0 10px rgba(212,175,110,.25)}
 
-/* SESSION OVERLAY */
-#s-session{position:absolute;inset:0;z-index:20;background:#000;flex-direction:column}
-.miss-banner{padding:14px 24px;border-bottom:1px solid var(--b);flex-shrink:0;background:rgba(201,168,108,.03)}
+/* SESSION DONE ROW */
+.miss-banner{padding:14px 24px;border-bottom:1px solid var(--b);flex-shrink:0;background:rgba(212,175,110,.04)}
 .miss-ey{font-size:9px;font-weight:700;letter-spacing:.22em;color:var(--g);text-transform:uppercase;margin-bottom:5px}
 .miss-body{font-size:13px;color:var(--t2);line-height:1.65}
 .done-row{display:flex;align-items:center;gap:14px;padding:14px 24px;border-bottom:1px solid var(--b);flex-shrink:0;cursor:pointer;user-select:none;transition:background .2s}
 .done-row:active{background:var(--s1)}
 .done-dot{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--b);display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;transition:all .3s cubic-bezier(.2,.8,.3,1)}
-.done-dot.on{background:var(--green);border-color:var(--green);box-shadow:0 0 12px rgba(74,222,128,.3)}
+.done-dot.on{background:var(--green);border-color:var(--green);box-shadow:0 0 12px rgba(90,230,138,.3)}
 .done-lbl{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t2);transition:color .3s}
 .done-row.on .done-lbl{color:var(--green)}
 
@@ -174,7 +193,7 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
 .ex-metas{display:flex;gap:18px}
 .ex-meta{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3)}
 .ex-meta span{color:var(--t2);font-variant-numeric:tabular-nums}
-.ex-note{margin:0 24px 14px;padding:12px 14px;border-left:1px solid var(--bg);background:rgba(201,168,108,.025);border-radius:0 8px 8px 0}
+.ex-note{margin:0 24px 14px;padding:12px 14px;border-left:1px solid var(--bg);background:rgba(212,175,110,.03);border-radius:0 8px 8px 0}
 .ex-note-txt{font-size:12px;color:var(--t2);line-height:1.7}
 .ex-vid{display:inline-flex;align-items:center;gap:5px;margin:0 24px 14px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--g);text-decoration:none;border-bottom:1px solid var(--bg);padding-bottom:2px;transition:all .2s}
 .ex-vid:active{color:var(--g2)}
@@ -182,7 +201,7 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
 .ex-sets-lbl{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);margin-right:4px;flex-shrink:0}
 .set-btn{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--b);background:none;cursor:pointer;font-size:11px;font-weight:600;color:var(--t3);font-family:inherit;display:flex;align-items:center;justify-content:center;transition:all .22s cubic-bezier(.2,.8,.3,1);flex-shrink:0;font-variant-numeric:tabular-nums}
 .set-btn:active{transform:scale(.85)}
-.set-btn.on{background:var(--g);border-color:var(--g);color:#000;box-shadow:0 0 10px rgba(201,168,108,.25);font-size:10px}
+.set-btn.on{background:var(--g);border-color:var(--g);color:#000;box-shadow:0 0 10px rgba(212,175,110,.25);font-size:10px}
 .mait-btn{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);cursor:pointer;user-select:none;transition:color .2s;flex-shrink:0;white-space:nowrap}
 .mait-btn.on{color:var(--g)}
 .mait-star{font-size:13px;transition:transform .25s cubic-bezier(.2,.8,.3,1)}
@@ -197,18 +216,17 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
 .coach-link{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--g);text-decoration:none;border-bottom:1px solid var(--bg);padding-bottom:2px}
 
 /* TABBAR */
-.tabbar{background:rgba(0,0,0,.88);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border-top:1px solid var(--b);display:flex;padding:10px 0;padding-bottom:max(env(safe-area-inset-bottom,0px),10px);flex-shrink:0;z-index:5}
+.tabbar{background:rgba(12,10,7,.92);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border-top:1px solid var(--b);display:flex;padding:10px 0;padding-bottom:max(env(safe-area-inset-bottom,0px),10px);flex-shrink:0;z-index:5}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:none;cursor:pointer;padding:4px 0;font-family:inherit;transition:all .2s}
 .tab-dot{width:4px;height:4px;border-radius:50%;background:var(--t3);transition:all .3s cubic-bezier(.2,.8,.3,1)}
-.tab.on .tab-dot{background:var(--g);box-shadow:0 0 8px rgba(201,168,108,.55);transform:scale(1.3)}
-.tab-lbl{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);transition:color .2s}
+.tab.on .tab-dot{background:var(--g);box-shadow:0 0 8px rgba(212,175,110,.6);transform:scale(1.4)}
+.tab-lbl{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);transition:color .25s}
 .tab.on .tab-lbl{color:var(--g)}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
-
 <canvas id="cv"></canvas>
 
 <!-- AUTH -->
@@ -225,101 +243,98 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
 
 <!-- APP -->
 <div id="app">
+  <div class="sw">
 
-  <!-- HOME -->
-  <div class="screen" id="s-home">
-    <div class="nb"><div class="nb-mark">P+</div><div class="nb-sp"></div></div>
-    <div class="sc">
-      <div class="hero">
-        <div class="hero-ey">Client</div>
-        <div class="hero-name">Marjana<br>Houloud</div>
-        <div class="hero-date">Début · 25 mai 2026</div>
-        <div class="hero-links">
-          <a class="hero-link" href="https://docs.google.com/document/d/1tys6hyZD2eY9rp23McWszw6R8ftYqXvXE8Pan1GedlA/edit?tab=t.0" target="_blank">Contrat</a>
-          <a class="hero-link" href="https://youtu.be/I-ZyNX-SFTo" target="_blank">Programme vidéo</a>
+    <!-- HOME -->
+    <div class="screen on" id="s-home">
+      <div class="nb"><div class="nb-mark">P+</div><div class="nb-sp"></div></div>
+      <div class="sc">
+        <div class="hero">
+          <div class="hero-ey">Client</div>
+          <div class="hero-name">Marjana<br>Houloud</div>
+          <div class="hero-date">Début · 25 mai 2026</div>
+          <div class="hero-links">
+            <a class="hero-link" href="https://docs.google.com/document/d/1tys6hyZD2eY9rp23McWszw6R8ftYqXvXE8Pan1GedlA/edit?tab=t.0" target="_blank">Contrat</a>
+            <a class="hero-link" href="https://youtu.be/I-ZyNX-SFTo" target="_blank">Programme vidéo</a>
+          </div>
+        </div>
+        <div class="metrics">
+          <div class="met"><div class="met-v" id="st-obj" style="color:var(--g)">0/20</div><div class="met-l">Objectifs</div></div>
+          <div class="met"><div class="met-v" id="st-sess" style="color:var(--green)">0/9</div><div class="met-l">Séances</div></div>
+          <div class="met"><div class="met-v" id="st-pct">0%</div><div class="met-l">Complété</div></div>
+        </div>
+        <div class="sect"><div class="sect-lbl">Roadmap</div><div id="h-roadmap"></div></div>
+        <div class="sect"><div class="sect-lbl">Prochaine séance</div><div id="h-next"></div></div>
+      </div>
+    </div>
+
+    <!-- ROADMAP -->
+    <div class="screen" id="s-roadmap">
+      <div class="nb"><div class="nb-mark">P+</div><div class="nb-title" id="rm-title">Roadmap</div><div class="nb-sp"></div></div>
+      <div class="sc"><div id="phases"></div></div>
+    </div>
+
+    <!-- SÉANCES -->
+    <div class="screen" id="s-seances">
+      <div class="nb"><div class="nb-mark">P+</div><div class="nb-title">Séances</div><div class="nb-sp"></div></div>
+      <div class="sc" id="sc-seances">
+        <div id="sel-prog">
+          <div class="sect"><div class="sect-lbl">Programme</div><div class="prog-grid" id="prog-grid"></div></div>
+        </div>
+        <div id="sel-sess" style="display:none">
+          <div class="back-row"><button class="back-btn" onclick="closeProg()">← Retour</button></div>
+          <div id="sess-cont"></div>
         </div>
       </div>
-      <div class="metrics">
-        <div class="met"><div class="met-v" id="st-obj" style="color:var(--g)">0/20</div><div class="met-l">Objectifs</div></div>
-        <div class="met"><div class="met-v" id="st-sess" style="color:var(--green)">0/9</div><div class="met-l">Séances</div></div>
-        <div class="met"><div class="met-v" id="st-pct">0%</div><div class="met-l">Complété</div></div>
-      </div>
-      <div class="sect">
-        <div class="sect-lbl">Roadmap</div>
-        <div id="h-roadmap"></div>
-      </div>
-      <div class="sect">
-        <div class="sect-lbl">Prochaine séance</div>
-        <div id="h-next"></div>
-      </div>
     </div>
-  </div>
 
-  <!-- ROADMAP -->
-  <div class="screen" id="s-roadmap">
-    <div class="nb"><div class="nb-mark">P+</div><div class="nb-title" id="rm-title">Roadmap</div><div class="nb-sp"></div></div>
-    <div class="sc"><div id="phases"></div></div>
-  </div>
-
-  <!-- SÉANCES -->
-  <div class="screen" id="s-seances">
-    <div class="nb"><div class="nb-mark">P+</div><div class="nb-title">Séances</div><div class="nb-sp"></div></div>
-    <div class="sc" id="sc-seances">
-      <div id="sel-prog">
-        <div class="sect"><div class="sect-lbl">Programme</div><div class="prog-grid" id="prog-grid"></div></div>
-      </div>
-      <div id="sel-sess" style="display:none">
-        <div class="back-row"><button class="back-btn" onclick="closeProg()">← Retour</button></div>
-        <div id="sess-cont"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SESSION OVERLAY -->
-  <div class="screen" id="s-session">
-    <div class="nb"><button class="nb-back" onclick="closeSession()">← Séances</button><div class="nb-title" id="sess-title"></div><div class="nb-sp"></div></div>
-    <div id="miss-wrap" class="miss-banner" style="display:none">
-      <div class="miss-ey">Mission de la semaine</div>
-      <div class="miss-body" id="miss-txt"></div>
-    </div>
-    <div class="done-row" id="done-row" onclick="toggleDone()">
-      <div class="done-dot" id="done-dot"></div>
-      <div class="done-lbl" id="done-lbl">Marquer comme complétée</div>
-    </div>
-    <div class="sc" style="padding-bottom:max(env(safe-area-inset-bottom,0px),24px)">
-      <div id="ex-cont"></div>
-    </div>
-  </div>
-
-  <!-- COACH -->
-  <div class="screen" id="s-coach">
-    <div class="nb"><div class="nb-mark">P+</div><div class="nb-title">Coach</div><div class="nb-sp"></div></div>
-    <div class="sc">
-      <div class="coach-block">
-        <div class="coach-title">🤸 Handstand — Protocole</div>
-        <div class="coach-body">Séances de <strong style="color:var(--t)">20 minutes</strong>, entre 8 et 12 par semaine. Parfois 2 par jour. 20 minutes c'est rien — c'est enlever 20 min de scroll TikTok.</div>
-        <div class="coach-links">
-          <a class="coach-link" href="https://www.youtube.com/watch?v=wQInEf1r50g" target="_blank">↗ Échauffement poignets</a>
-          <a class="coach-link" href="https://calendly.com/julian-geroudet/bilan-offfert" target="_blank">↗ Agenda coach</a>
+    <!-- COACH -->
+    <div class="screen" id="s-coach">
+      <div class="nb"><div class="nb-mark">P+</div><div class="nb-title">Coach</div><div class="nb-sp"></div></div>
+      <div class="sc">
+        <div class="coach-block">
+          <div class="coach-title">🤸 Handstand — Protocole</div>
+          <div class="coach-body">Séances de <strong style="color:var(--t)">20 minutes</strong>, entre 8 et 12 par semaine. Parfois 2 par jour. 20 minutes c'est rien — c'est enlever 20 min de scroll TikTok.</div>
+          <div class="coach-links">
+            <a class="coach-link" href="https://www.youtube.com/watch?v=wQInEf1r50g" target="_blank">↗ Échauffement poignets</a>
+            <a class="coach-link" href="https://calendly.com/julian-geroudet/bilan-offfert" target="_blank">↗ Agenda coach</a>
+          </div>
+        </div>
+        <div class="coach-block">
+          <div class="coach-title">Qualité · Priorité absolue</div>
+          <div class="coach-body">Pas de spam. Concentration maximale sur chaque essai. La qualité crée la progression, pas la quantité.</div>
+        </div>
+        <div class="coach-block">
+          <div class="coach-title">💪 Programme force — Protocole</div>
+          <div class="coach-body">Remplis tes performances à chaque séance. Le coach regarde chaque semaine et donne des objectifs hebdomadaires.</div>
+          <div class="coach-links">
+            <a class="coach-link" href="https://youtube.com/shorts/GLio_cGJalk?feature=share" target="_blank">↗ Échauffement spécifique</a>
+          </div>
+        </div>
+        <div class="coach-block">
+          <div class="coach-title">Questions</div>
+          <div class="coach-body">Pour toute question sur un exercice — ou si une position semble risquée — envoie un message WhatsApp au coach.</div>
         </div>
       </div>
-      <div class="coach-block">
-        <div class="coach-title">Qualité · Priorité absolue</div>
-        <div class="coach-body">Pas de spam. Concentration maximale sur chaque essai. La qualité crée la progression, pas la quantité.</div>
+    </div>
+
+    <!-- SESSION OVERLAY -->
+    <div class="screen" id="s-session">
+      <div class="nb"><button class="nb-back" onclick="closeSession()">← Séances</button><div class="nb-title" id="sess-title"></div><div class="nb-sp"></div></div>
+      <div id="miss-wrap" class="miss-banner" style="display:none">
+        <div class="miss-ey">Mission de la semaine</div>
+        <div class="miss-body" id="miss-txt"></div>
       </div>
-      <div class="coach-block">
-        <div class="coach-title">💪 Programme force — Protocole</div>
-        <div class="coach-body">Remplis tes performances à chaque séance. Le coach regarde chaque semaine et donne des objectifs hebdomadaires.</div>
-        <div class="coach-links">
-          <a class="coach-link" href="https://youtube.com/shorts/GLio_cGJalk?feature=share" target="_blank">↗ Échauffement spécifique</a>
-        </div>
+      <div class="done-row" id="done-row" onclick="toggleDone()">
+        <div class="done-dot" id="done-dot"></div>
+        <div class="done-lbl" id="done-lbl">Marquer comme complétée</div>
       </div>
-      <div class="coach-block">
-        <div class="coach-title">Questions</div>
-        <div class="coach-body">Pour toute question sur un exercice — ou si une position semble risquée — envoie un message WhatsApp au coach.</div>
+      <div class="sc" style="padding-bottom:max(env(safe-area-inset-bottom,0px),24px)">
+        <div id="ex-cont"></div>
       </div>
     </div>
-  </div>
+
+  </div><!-- /sw -->
 
   <!-- TABBAR -->
   <div class="tabbar" id="tabbar">
@@ -331,19 +346,18 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
 </div>
 
 <script>
-/* CANVAS PARTICLES */
+/* CANVAS */
 (function(){
   const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
   let W,H,pts;
   function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight}
-  function make(){pts=Array.from({length:55},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*.9+.15,a:Math.random()*.3+.05,vx:(Math.random()-.5)*.07,vy:-Math.random()*.1-.02,p:Math.random()*Math.PI*2,ps:Math.random()*.007+.003}))}
+  function make(){pts=Array.from({length:55},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*.9+.15,a:Math.random()*.28+.06,vx:(Math.random()-.5)*.07,vy:-Math.random()*.1-.02,p:Math.random()*Math.PI*2,ps:Math.random()*.007+.003}))}
   function draw(){
     ctx.clearRect(0,0,W,H);
     pts.forEach(p=>{
-      p.p+=p.ps;
-      const a=p.a*(.55+.45*Math.sin(p.p));
+      p.p+=p.ps;const a=p.a*(.55+.45*Math.sin(p.p));
       ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle=`rgba(201,168,108,${a})`;ctx.fill();
+      ctx.fillStyle=`rgba(212,175,110,${a})`;ctx.fill();
       p.x+=p.vx;p.y+=p.vy;
       if(p.y<-2)p.y=H+2;if(p.x<-2)p.x=W+2;if(p.x>W+2)p.x=-2;
     });
@@ -356,7 +370,7 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
 /* DATA */
 const PWD='perf2026';
 const PHASES=[
-  {id:'p1',num:'01',name:'Fondations',color:'#C9A86C',objectifs:[
+  {id:'p1',num:'01',name:'Fondations',color:'#D4AF6E',objectifs:[
     'Prendre en force dans les épaules / Obj : 45 secondes 3 fois au mur',
     'Volume en pompe / Obj : 20 pompes',
     'Prise de muscle dorsaux / Obj : Maîtrise de 10 tractions australiennes 100% horizontale',
@@ -375,14 +389,14 @@ const SESSIONS={
       null,null,null,null,null
     ]},
     {id:'hs2',num:2,mission:null,exercises:[
-      {name:'Handstand ventre au mur',series:'10',reps:'15 sec',note:"1 min de repos\n\nPlace tes mains à 20–30 cm du mur pour éviter de basculer vers l'avant. L'objectif : force dans les épaules, pas encore l'équilibre.",video:'https://www.youtube.com/watch?v=fSwLVRnBROg'},
+      {name:'Handstand ventre au mur',series:'10',reps:'15 sec',note:"1 min de repos\n\nPlace tes mains à 20–30 cm du mur. L'objectif : force dans les épaules, pas encore l'équilibre.",video:'https://www.youtube.com/watch?v=fSwLVRnBROg'},
       {name:'Wall walk',series:'4',reps:'3 reps',note:"1 min de repos\n\nApprendre à bien se mettre en position ventre au mur en économisant sa force.",video:'https://www.youtube.com/watch?v=5GdCFunkYGM'},
       null,null,null,null,null
     ]},
     {id:'hs3',num:3,mission:null,exercises:[null,null,null,null,null,null,null]},
     {id:'hs4',num:4,mission:null,exercises:[null,null,null,null,null,null,null]}
   ]},
-  pr:{name:'Programme',icon:'💪',color:'#C9A86C',sub:'Force & Calisthénie · Track tes perfs',sessions:[
+  pr:{name:'Programme',icon:'💪',color:'#D4AF6E',sub:'Force & Calisthénie · Track tes perfs',sessions:[
     {id:'pr1',num:1,mission:null,exercises:[null,null,null,null,null,null,null]},
     {id:'pr2',num:2,mission:null,exercises:[null,null,null,null,null,null,null]},
     {id:'pr3',num:3,mission:null,exercises:[null,null,null,null,null,null,null]},
@@ -404,7 +418,7 @@ function login(){
   if(document.getElementById('pwd').value===PWD){
     document.getElementById('auth').style.display='none';
     document.getElementById('app').classList.add('on');
-    goTab('home');buildAll();
+    buildAll();
   } else {
     const e=document.getElementById('a-err');
     e.textContent='Accès refusé.';
@@ -413,20 +427,43 @@ function login(){
   }
 }
 
-/* NAV */
+/* SMOOTH TAB NAVIGATION */
 function goTab(id){
-  document.getElementById('s-session').classList.remove('on');
-  document.getElementById('tabbar').style.display='flex';
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  if(id===curTab&&id!=='seances')return;
+
+  // Hide session if open
+  const sess=document.getElementById('s-session');
+  if(sess.classList.contains('on')){
+    sess.classList.remove('on');
+    document.getElementById('tabbar').style.display='flex';
+  }
+
+  const prev=document.getElementById('s-'+curTab);
+  const next=document.getElementById('s-'+id);
+
+  if(prev&&prev!==next){
+    prev.classList.remove('on');
+  }
+
+  // Small delay so CSS transition fires
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      if(next)next.classList.add('on');
+    });
+  });
+
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  const el=document.getElementById('s-'+id);if(el)el.classList.add('on');
   const tb=document.getElementById('t-'+id);if(tb)tb.classList.add('on');
   curTab=id;
+
   if(id==='home'){buildHomeRM();buildHomeNext();updateStats();}
   if(id==='roadmap')buildRoadmap();
   if(id==='seances')buildProgGrid();
 }
-function buildAll(){buildRoadmap();buildHomeRM();buildHomeNext();updateStats();buildProgGrid();}
+
+function buildAll(){
+  buildRoadmap();buildHomeRM();buildHomeNext();updateStats();buildProgGrid();
+}
 
 /* STATS */
 function objDone(){let d=0;PHASES.forEach(ph=>ph.objectifs.forEach((o,i)=>{if(o&&ls('pp_obj_'+ph.id+'_'+i)==='1')d++;}));return d;}
@@ -436,7 +473,7 @@ function updateStats(){
   tx('st-obj',od+'/20');tx('st-sess',sd+'/9');tx('st-pct',Math.round((od+sd)/29*100)+'%');
 }
 
-/* HOME ROADMAP */
+/* HOME */
 function buildHomeRM(){
   const el=document.getElementById('h-roadmap');el.innerHTML='';
   PHASES.forEach(ph=>{
@@ -446,8 +483,6 @@ function buildHomeRM(){
     el.appendChild(d);
   });
 }
-
-/* HOME NEXT */
 function buildHomeNext(){
   const el=document.getElementById('h-next');el.innerHTML='';
   for(const[pid,prog]of Object.entries(SESSIONS)){
@@ -524,7 +559,7 @@ function closeProg(){
   buildProgGrid();
 }
 
-/* SESSION DETAIL */
+/* SESSION */
 function openSession(pid,sessId){
   const prog=SESSIONS[pid];const sess=prog.sessions.find(s=>s.id===sessId);if(!sess)return;
   curSess={pid,sessId};
@@ -532,7 +567,11 @@ function openSession(pid,sessId){
   const mw=document.getElementById('miss-wrap');
   if(sess.mission){mw.style.display='block';tx('miss-txt',sess.mission);}else mw.style.display='none';
   refreshDone(sessId);buildEx(pid,sess);
-  document.getElementById('s-session').classList.add('on');
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      document.getElementById('s-session').classList.add('on');
+    });
+  });
   document.getElementById('tabbar').style.display='none';
   const sw=document.querySelector('#s-session .sc');if(sw)sw.scrollTop=0;
 }
