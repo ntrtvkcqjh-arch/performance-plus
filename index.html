@@ -630,7 +630,7 @@ const PHASES=[
 const SESSIONS={
   hs:{name:'Handstand',icon:'🤸',color:'#A878C9',sub:'Suivi personnalisé · 20 min/séance',sessions:[
     {id:'hs1',num:1,name:'Séance 1',mission:"Premier cycle : construire de la force dans les épaules, pas d'équilibre — que de la force. Si t'as la moindre question sur un exercice envoie-la moi par WhatsApp.",exercises:[
-      {name:'Handstand dos au mur',series:'8',reps:'45 sec',note:"2 min de repos\n\nNe cherche pas l'équilibre, juste pose-toi sur le mur et tiens. Dos contre le mur — c'est la position pour renforcer les épaules.",video:null},
+      {name:'Handstand dos au mur',series:'8',reps:'45 sec',note:"2 min de repos\n\nNe cherche pas l'équilibre, juste pose toi sur le mur et tiens comme sur la vidéo.\n\nY a moyen que la vidéo marche pas mais en gros tiens juste dos contre le mur comme sur la photo de mon élève, c'est la position pour renforcer tes épaules.",video:null},
       {name:'Handstand dos au mur — Travail du grip',series:'4',reps:'3 reps',note:'1 min de repos',video:'https://www.youtube.com/watch?v=5IXOpjh-RVY'},
       null,null,null,null,null
     ]},
@@ -683,15 +683,13 @@ let curTab='home',curProg=null,curSess=null;
 const ls=k=>localStorage.getItem(k);
 const ss=(k,v)=>localStorage.setItem(k,v);
 
-/* ── MIGRATION v3 : supprime les saves all-null des sessions qui ont maintenant de vrais exercices ── */
+/* ── MIGRATION v4 : reset complet des caches exercices (une seule fois) ── */
 (function migrate(){
-  if(ls('pp_migr')==='3')return;
-  ['pr1','pr2','pr3','hs1','hs2'].forEach(id=>{
-    const raw=localStorage.getItem('pp_custom_'+id);
-    if(!raw)return;
-    try{const d=JSON.parse(raw);if(Array.isArray(d)&&!d.some(e=>e&&e.name))localStorage.removeItem('pp_custom_'+id);}catch(e){}
+  if(localStorage.getItem('pp_migr')==='4')return;
+  ['pr1','pr2','pr3','pr4','pr5','hs1','hs2','hs3','hs4'].forEach(id=>{
+    localStorage.removeItem('pp_custom_'+id);
   });
-  ss('pp_migr','3');
+  localStorage.setItem('pp_migr','4');
 })();
 const tx=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t};
 
