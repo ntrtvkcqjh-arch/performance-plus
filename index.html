@@ -348,6 +348,15 @@ body.app-on #cv{opacity:0}
 .comm-reply-box{margin-top:10px;background:var(--s2);border-radius:10px;padding:10px 13px;font-size:13px;color:var(--t2);line-height:1.55;border-left:2px solid var(--g2)}
 .comm-empty{text-align:center;font-size:12px;color:var(--t3);padding:24px 0;letter-spacing:.04em}
 .comm-section-lbl{font-size:9px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);padding-top:20px;margin-bottom:0}
+/* ── État "bientôt disponible" ── */
+.ex-empty-soon{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px 28px;gap:14px;text-align:center}
+.ex-empty-ic{font-size:46px}
+.ex-empty-ttl{font-size:19px;font-weight:600;color:var(--t);letter-spacing:-.2px}
+.ex-empty-sub{font-size:13px;color:var(--t2);line-height:1.6;max-width:240px}
+.ex-empty-coach{background:var(--s1);border:1.5px dashed rgba(17,17,17,.12);border-radius:16px;padding:22px;margin:8px 22px;font-size:13px;color:var(--t2);text-align:center;line-height:1.6}
+.ex-empty-coach strong{color:var(--g)}
+.prog-coming{position:absolute;top:10px;right:10px;background:rgba(17,17,17,.07);border-radius:8px;font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--t2);padding:3px 7px}
+.prog-tile{position:relative}
 /* ── comment enhancements: reply, video, like ── */
 .comm-vid-btn{background:none;border:none;cursor:pointer;font-size:11px;font-weight:600;color:var(--t2);padding:0;font-family:inherit;letter-spacing:.04em;transition:color .18s}
 .comm-vid-btn:hover{color:var(--g)}
@@ -870,9 +879,21 @@ const SESSIONS={
     ]},
     {id:'pr4',num:4,name:'Séance 4',mission:null,exercises:[null,null,null,null,null,null,null]},
     {id:'pr5',num:5,name:'Séance 5',mission:null,exercises:[null,null,null,null,null,null,null]}
+  ]},
+  ls:{name:'L-Sit',icon:'⚡',color:'#E07A5F',sub:'Flexibilité & Core · Progressif',sessions:[
+    {id:'ls1',num:1,name:'Séance 1',mission:null,exercises:[null,null,null,null,null,null,null]},
+    {id:'ls2',num:2,name:'Séance 2',mission:null,exercises:[null,null,null,null,null,null,null]},
+    {id:'ls3',num:3,name:'Séance 3',mission:null,exercises:[null,null,null,null,null,null,null]},
+    {id:'ls4',num:4,name:'Séance 4',mission:null,exercises:[null,null,null,null,null,null,null]}
+  ]},
+  tr:{name:'Traction',icon:'🏋️',color:'#3D8B68',sub:'Force & Calisthénie · Montée de barre',sessions:[
+    {id:'tr1',num:1,name:'Séance 1',mission:null,exercises:[null,null,null,null,null,null,null]},
+    {id:'tr2',num:2,name:'Séance 2',mission:null,exercises:[null,null,null,null,null,null,null]},
+    {id:'tr3',num:3,name:'Séance 3',mission:null,exercises:[null,null,null,null,null,null,null]},
+    {id:'tr4',num:4,name:'Séance 4',mission:null,exercises:[null,null,null,null,null,null,null]}
   ]}
 };
-const NS={hs:6,pr:4};
+const NS={hs:6,pr:4,ls:5,tr:5};
 
 /* COACH DEFAULT DATA */
 const COACH_DEFAULT=[
@@ -890,7 +911,7 @@ const ss=(k,v)=>localStorage.setItem(k,v);
 /* ── MIGRATION v4 : reset complet des caches exercices (une seule fois) ── */
 (function migrate(){
   if(localStorage.getItem('pp_migr')==='4')return;
-  ['pr1','pr2','pr3','pr4','pr5','hs1','hs2','hs3','hs4'].forEach(id=>{
+  ['pr1','pr2','pr3','pr4','pr5','hs1','hs2','hs3','hs4','ls1','ls2','ls3','ls4','tr1','tr2','tr3','tr4'].forEach(id=>{
     localStorage.removeItem('pp_custom_'+id);
   });
   localStorage.setItem('pp_migr','4');
@@ -1252,12 +1273,20 @@ function toggleObj(phId,idx){
 }
 
 /* SÉANCES */
+function progHasContent(pid){
+  return SESSIONS[pid].sessions.some(sess=>getEffectiveEx(sess,sess.id).some(e=>e&&e.name));
+}
 function buildProgGrid(){
   const g=document.getElementById('prog-grid');g.innerHTML='';
   Object.entries(SESSIONS).forEach(([pid,prog])=>{
     const done=sessDone(pid),total=prog.sessions.length,pct=done/total*100;
-    const t=document.createElement('div');t.className='prog-tile';t.onclick=()=>openProg(pid);
-    t.innerHTML=`<div class="prog-tile-ic">${prog.icon}</div><div class="prog-tile-name">${prog.name}</div><div class="prog-tile-sub">${prog.sub}</div><div class="prog-tile-track"><div class="prog-tile-fill" style="width:${pct}%;background:${prog.color}"></div></div><div class="prog-tile-ct">${done}/${total} séances</div>`;
+    const empty=!progHasContent(pid);
+    const t=document.createElement('div');t.className='prog-tile';
+    t.onclick=()=>{ if(empty&&!isCoach()){showToast('Bientôt disponible 🔜');return;} openProg(pid); };
+    const badge=empty&&!isCoach()?'<div class="prog-coming">Bientôt</div>':'';
+    const ctTxt=empty&&!isCoach()?'En préparation…':`${done}/${total} séances`;
+    t.innerHTML=`${badge}<div class="prog-tile-ic">${prog.icon}</div><div class="prog-tile-name">${prog.name}</div><div class="prog-tile-sub">${prog.sub}</div><div class="prog-tile-track"><div class="prog-tile-fill" style="width:${pct}%;background:${prog.color}"></div></div><div class="prog-tile-ct">${ctTxt}</div>`;
+    t.style.opacity=empty&&!isCoach()?'.7':'1';
     g.appendChild(t);
   });
 }
@@ -1271,8 +1300,13 @@ function openProg(pid){
     const xc=sess.exercises.filter(e=>e).length;
     const r=document.createElement('div');r.className='sess-row'+(done?' done':'');r.onclick=()=>openSession(pid,sess.id);
     const rowName=sess.name&&sess.name!=='Séance '+sess.num?sess.name:`Séance ${sess.num}`;
-    const rowSub=sess.name&&sess.name!=='Séance '+sess.num?`Séance ${sess.num} · ${done?'Complétée':(xc>0?xc+' ex.':'À venir')}`:(done?'Complétée':(xc>0?xc+' exercice'+(xc>1?'s':''):'À venir'));
-    r.innerHTML=`<div class="sess-n">${String(sess.num).padStart(2,'0')}</div><div class="sess-body"><div class="sess-name">${rowName}</div><div class="sess-sub">${rowSub}</div></div><div class="sess-check">${done?'✓':''}</div>`;
+    const effEx=getEffectiveEx(sess,sess.id);const hasEx=effEx.some(e=>e&&e.name);
+    const comingSoon=!hasEx&&!isCoach();
+    const rowSub=comingSoon?'Bientôt disponible':
+      (sess.name&&sess.name!=='Séance '+sess.num?`Séance ${sess.num} · ${done?'Complétée':(xc>0?xc+' ex.':'À définir')}`:(done?'Complétée':(xc>0?xc+' exercice'+(xc>1?'s':''):(isCoach()?'À définir':'À venir'))));
+    r.onclick=comingSoon?()=>showToast('Bientôt disponible 🔜'):()=>openSession(pid,sess.id);
+    if(comingSoon)r.style.opacity='.6';
+    r.innerHTML=`<div class="sess-n">${String(sess.num).padStart(2,'0')}</div><div class="sess-body"><div class="sess-name">${rowName}</div><div class="sess-sub">${rowSub}</div></div><div class="sess-check">${comingSoon?'🔜':(done?'✓':'')}</div>`;
     c.appendChild(r);
   });
   document.getElementById('sc-seances').scrollTop=0;
@@ -1356,7 +1390,17 @@ function buildEx(pid,sess){
     c.appendChild(card);
     renderExComms(sess.id,idx);
   });
-  if(!any)c.innerHTML='<div class="ex-empty">Séance à définir par le coach.<br>Reviens bientôt.</div>';
+  if(!any){
+    if(isCoach()){
+      c.innerHTML='<div class="ex-empty-coach">Aucun exercice défini · Appuie sur <strong>Modifier</strong> pour construire cette séance</div>';
+    } else {
+      c.innerHTML=`<div class="ex-empty-soon">
+        <div class="ex-empty-ic">🔜</div>
+        <div class="ex-empty-ttl">Bientôt disponible</div>
+        <div class="ex-empty-sub">Julian prépare ce programme pour toi · Reviens vite !</div>
+      </div>`;
+    }
+  }
 }
 function toggleSet(sessId,exIdx,si,ns,btn){
   const k='pp_sets_'+sessId+'_'+exIdx;
