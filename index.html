@@ -61,6 +61,7 @@ body.app-on #cv{opacity:0}
 #app{
   --t:#111111;
   --t2:rgba(17,17,17,.5);
+  color:#111111; /* force l'héritage de la couleur dans tout l'app */
   --t3:rgba(17,17,17,.27);
   --b:rgba(17,17,17,.07);
   --bg:rgba(200,150,15,.2);
@@ -297,6 +298,103 @@ body.app-on #cv{opacity:0}
 .tab-lbl{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);transition:color .25s}
 .tab.on .tab-lbl{color:var(--g)}
 
+/* ── NOTES ── */
+.note-wrap{padding:20px 22px;border-top:1px solid var(--b)}
+.note-lbl{font-size:9px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
+.note-area{width:100%;background:var(--s1);border:1px solid var(--b);border-radius:14px;padding:14px 16px;font-size:14px;color:var(--t);font-family:inherit;resize:none;outline:none;min-height:72px;line-height:1.55;transition:border-color .22s,box-shadow .22s;display:block}
+.note-area:focus{border-color:var(--g2);box-shadow:0 0 0 3px rgba(233,185,73,.14)}
+.note-area::placeholder{color:var(--t3);font-size:13px}
+.note-saved{font-size:10px;color:var(--t3);margin-top:6px;letter-spacing:.04em;transition:opacity .4s;height:14px}
+
+/* ── COMMENTAIRES ── */
+.comm-wrap{padding:0 22px 16px;border-top:1px solid var(--b)}
+.comm-composer{display:flex;gap:11px;align-items:flex-start;padding-top:20px;margin-bottom:16px}
+.comm-av{width:34px;height:34px;border-radius:50%;background:var(--g-dim);border:1.5px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--g);flex-shrink:0;letter-spacing:.02em}
+.comm-right{flex:1;min-width:0}
+.comm-input{width:100%;background:var(--s1);border:1px solid var(--b);border-radius:14px;padding:12px 15px;font-size:14px;color:var(--t);font-family:inherit;resize:none;outline:none;overflow:hidden;line-height:1.5;transition:border-color .22s,box-shadow .22s,min-height .25s cubic-bezier(.25,.8,.25,1);min-height:44px;max-height:120px;display:block}
+.comm-input:focus{border-color:var(--g2);box-shadow:0 0 0 3px rgba(233,185,73,.14);min-height:80px}
+.comm-input::placeholder{color:var(--t3);font-size:13px}
+.comm-send{display:none;margin-top:8px;background:var(--g2);border:none;border-radius:11px;padding:9px 18px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#5A3A00;cursor:pointer;font-family:inherit;transition:opacity .15s,transform .15s;float:right}
+.comm-send:active{opacity:.75;transform:scale(.97)}
+.comm-right:focus-within .comm-send{display:block}
+.comm-list{display:flex;flex-direction:column;gap:0}
+.comm-item{display:flex;gap:11px;padding:14px 0;border-bottom:1px solid var(--b);animation:fadeUp .28s ease both}
+.comm-item:last-child{border-bottom:none}
+.comm-body{flex:1;min-width:0}
+.comm-name{font-size:12px;font-weight:700;color:var(--t);margin-bottom:3px}
+.comm-text{font-size:14px;color:var(--t);line-height:1.55;margin-bottom:7px;word-break:break-word}
+.comm-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.comm-time{font-size:11px;color:var(--t2)}
+.comm-like{background:none;border:none;cursor:pointer;font-size:12px;color:var(--t2);padding:0;font-family:inherit;display:flex;align-items:center;gap:4px;transition:color .18s;letter-spacing:.02em}
+.comm-like.on{color:#E05050}
+.comm-reply-btn{background:none;border:none;cursor:pointer;font-size:11px;font-weight:600;color:var(--t2);padding:0;font-family:inherit;letter-spacing:.04em;transition:color .18s}
+.comm-reply-btn:hover{color:var(--g)}
+.comm-reply-box{margin-top:10px;background:var(--s2);border-radius:10px;padding:10px 13px;font-size:13px;color:var(--t2);line-height:1.55;border-left:2px solid var(--g2)}
+.comm-empty{text-align:center;font-size:12px;color:var(--t3);padding:24px 0;letter-spacing:.04em}
+.comm-section-lbl{font-size:9px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);padding-top:20px;margin-bottom:0}
+
+/* ── AI BUTTON ── */
+.ai-btn-wrap{padding:20px 22px 28px}
+.ai-btn{width:100%;background:#111111;border:none;border-radius:18px;padding:18px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;font-family:inherit;transition:all .22s;position:relative;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.18)}
+.ai-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(233,185,73,.18) 0%,transparent 60%);opacity:0;transition:opacity .3s}
+.ai-btn:active::before{opacity:1}
+.ai-btn:active{transform:scale(.98)}
+.ai-ic{font-size:22px;flex-shrink:0}
+.ai-txt{flex:1;text-align:left}
+.ai-title{font-size:15px;font-weight:600;color:#FAF7F2;margin-bottom:2px}
+.ai-sub{font-size:11px;color:rgba(250,247,242,.42);letter-spacing:.03em}
+.ai-arr{font-size:18px;color:var(--g2)}
+
+/* ── AI PANEL ── */
+#ai-panel{position:fixed;inset:0;z-index:40;background:#F7F7F5;display:flex;flex-direction:column;opacity:0;pointer-events:none;transform:translateY(26px);transition:opacity .35s cubic-bezier(.25,.8,.25,1),transform .35s cubic-bezier(.25,.8,.25,1);will-change:opacity,transform}
+#ai-panel.on{opacity:1;pointer-events:auto;transform:translateY(0)}
+.ai-nb{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid rgba(17,17,17,.07);background:rgba(247,247,245,.92);backdrop-filter:blur(30px);flex-shrink:0}
+.ai-nb-title{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#111}
+.ai-nb-close{background:none;border:none;cursor:pointer;font-size:11px;font-weight:700;color:rgba(17,17,17,.4);padding:8px;letter-spacing:.08em;font-family:inherit;text-transform:uppercase;transition:color .18s}
+.ai-nb-close:active{color:#111}
+.ai-sc{flex:1;overflow-y:auto;padding:28px 22px 48px}
+.ai-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:220px;gap:18px}
+.ai-spin{width:38px;height:38px;border:2px solid rgba(233,185,73,.2);border-top-color:#E9B949;border-radius:50%;animation:spin .75s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-load-txt{font-size:13px;color:rgba(17,17,17,.4);letter-spacing:.05em}
+.ai-result{display:none;animation:fadeUp .35s ease both}
+.ai-tag{font-size:9px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:#9A7209;margin-bottom:12px}
+.ai-res-title{font-size:22px;font-weight:600;color:#111;margin-bottom:10px;line-height:1.25;letter-spacing:-.2px}
+.ai-res-body{font-size:14px;color:rgba(17,17,17,.6);line-height:1.72;margin-bottom:24px}
+.ai-suggestions{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.ai-sugg{background:#FFF;border:1px solid rgba(17,17,17,.07);border-radius:16px;padding:18px 18px;box-shadow:0 1px 10px rgba(0,0,0,.05);animation:fadeUp .35s ease both}
+.ai-sugg-lbl{font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9A7209;margin-bottom:6px}
+.ai-sugg-txt{font-size:14px;color:#111;line-height:1.6}
+.ai-actions{display:flex;gap:10px;position:sticky;bottom:0;background:#F7F7F5;padding:14px 0}
+.ai-accept{flex:1;background:#E9B949;border:none;border-radius:14px;padding:15px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#5A3A00;cursor:pointer;font-family:inherit;transition:all .18s}
+.ai-accept:active{opacity:.8;transform:scale(.98)}
+.ai-reject{background:rgba(17,17,17,.07);border:none;border-radius:14px;padding:15px 20px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(17,17,17,.45);cursor:pointer;font-family:inherit;transition:all .18s}
+.ai-reject:active{opacity:.7}
+
+/* ── EDIT SESSION ── */
+.edit-overlay{position:absolute;inset:0;z-index:25;background:#F7F7F5;display:flex;flex-direction:column;opacity:0;pointer-events:none;transform:translateY(16px);transition:opacity .3s cubic-bezier(.25,.8,.25,1),transform .3s cubic-bezier(.25,.8,.25,1)}
+.edit-overlay.on{opacity:1;pointer-events:auto;transform:translateY(0)}
+.edit-nb{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid rgba(17,17,17,.07);background:rgba(247,247,245,.92);backdrop-filter:blur(30px);flex-shrink:0}
+.edit-cancel{background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:rgba(17,17,17,.5);font-family:inherit;letter-spacing:.05em;padding:6px}
+.edit-ttl{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#111}
+.edit-ok{background:#E9B949;border:none;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5A3A00;cursor:pointer;font-family:inherit;transition:all .18s}
+.edit-ok:active{opacity:.8;transform:scale(.97)}
+.edit-sc{flex:1;overflow-y:auto;padding:18px 18px 48px}
+.edit-card{background:#FFF;border:1px solid rgba(17,17,17,.07);border-radius:16px;padding:18px;margin-bottom:12px;box-shadow:0 1px 8px rgba(0,0,0,.05)}
+.edit-idx{font-size:9px;font-weight:700;letter-spacing:.22em;color:#9A7209;text-transform:uppercase;margin-bottom:12px}
+.edit-field{width:100%;background:#F7F7F5;border:1px solid rgba(17,17,17,.09);border-radius:10px;padding:11px 13px;font-size:14px;color:#111;font-family:inherit;outline:none;margin-bottom:9px;transition:border-color .2s,box-shadow .2s;display:block;-webkit-appearance:none}
+.edit-field:focus{border-color:#E9B949;box-shadow:0 0 0 3px rgba(233,185,73,.15)}
+.edit-field::placeholder{color:rgba(17,17,17,.3)}
+.edit-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px}
+.edit-row .edit-field{margin-bottom:0}
+
+/* ── MODIFY BUTTON (navbar) ── */
+.nb-edit{background:none;border:1px solid var(--b);border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g);cursor:pointer;font-family:inherit;transition:all .2s}
+.nb-edit:active{background:var(--g-dim)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);left:50%;transform:translateX(-50%);background:#111;color:#FAF7F2;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;letter-spacing:.04em;z-index:999;white-space:nowrap;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
@@ -406,7 +504,11 @@ body.app-on #cv{opacity:0}
 
     <!-- SESSION OVERLAY -->
     <div class="screen" id="s-session">
-      <div class="nb"><button class="nb-back" onclick="closeSession()">← Séances</button><div class="nb-title" id="sess-title"></div><div class="nb-sp"></div></div>
+      <div class="nb">
+        <button class="nb-back" onclick="closeSession()">← Séances</button>
+        <div class="nb-title" id="sess-title"></div>
+        <button class="nb-edit" onclick="openEditSession()">Modifier</button>
+      </div>
       <div id="miss-wrap" class="miss-banner" style="display:none">
         <div class="miss-ey">Mission de la semaine</div>
         <div class="miss-body" id="miss-txt"></div>
@@ -415,12 +517,46 @@ body.app-on #cv{opacity:0}
         <div class="done-dot" id="done-dot"></div>
         <div class="done-lbl" id="done-lbl">Marquer comme complétée</div>
       </div>
-      <div class="sc" style="padding-bottom:max(env(safe-area-inset-bottom,0px),24px)">
+      <div class="sc" id="sess-sc" style="padding-bottom:max(env(safe-area-inset-bottom,0px),24px)">
         <div id="ex-cont"></div>
+        <div id="comm-main"></div>
+      </div>
+      <!-- Edit overlay -->
+      <div class="edit-overlay" id="edit-overlay">
+        <div class="edit-nb">
+          <button class="edit-cancel" onclick="closeEditSession()">Annuler</button>
+          <div class="edit-ttl">Modifier séance</div>
+          <button class="edit-ok" onclick="saveEditSession()">Enregistrer</button>
+        </div>
+        <div class="edit-sc"><div id="edit-cont"></div></div>
       </div>
     </div>
 
   </div><!-- /sw -->
+
+  <!-- AI PANEL (global overlay) -->
+  <div id="ai-panel">
+    <div class="ai-nb">
+      <div class="ai-nb-title">✨ Optimisation IA</div>
+      <button class="ai-nb-close" onclick="closeAI()">Fermer ✕</button>
+    </div>
+    <div class="ai-sc">
+      <div class="ai-loading" id="ai-loading">
+        <div class="ai-spin"></div>
+        <div class="ai-load-txt">Analyse de ta séance...</div>
+      </div>
+      <div class="ai-result" id="ai-result">
+        <div class="ai-tag">Analyse personnalisée</div>
+        <div class="ai-res-title">Recommandations pour ta progression</div>
+        <div class="ai-res-body">Basé sur ta progression et tes performances récentes, voici les ajustements recommandés pour maximiser tes résultats lors des prochaines séances.</div>
+        <div class="ai-suggestions" id="ai-sugg-list"></div>
+        <div class="ai-actions">
+          <button class="ai-accept" onclick="acceptAI()">Appliquer les suggestions ✨</button>
+          <button class="ai-reject" onclick="closeAI()">Ignorer</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- TABBAR -->
   <div class="tabbar" id="tabbar">
@@ -698,17 +834,24 @@ function openSession(pid,sessId){
   tx('sess-title',prog.name+' · '+sess.num);
   const mw=document.getElementById('miss-wrap');
   if(sess.mission){mw.style.display='block';tx('miss-txt',sess.mission);}else mw.style.display='none';
-  refreshDone(sessId);buildEx(pid,sess);
+  refreshDone(sessId);
+  // Use custom exercises if saved
+  const custom=JSON.parse(ls('pp_custom_'+sessId)||'null');
+  const sessWithCustom=custom?{...sess,exercises:custom}:sess;
+  buildEx(pid,sessWithCustom);
+  buildCommMain(pid,sess);
   requestAnimationFrame(()=>{
     requestAnimationFrame(()=>{
       document.getElementById('s-session').classList.add('on');
     });
   });
   document.getElementById('tabbar').style.display='none';
-  const sw=document.querySelector('#s-session .sc');if(sw)sw.scrollTop=0;
+  const sw=document.getElementById('sess-sc');if(sw)sw.scrollTop=0;
 }
 function closeSession(){
   document.getElementById('s-session').classList.remove('on');
+  closeEditSession();
+  closeAI();
   document.getElementById('tabbar').style.display='flex';
   if(curProg)openProg(curProg);
   updateStats();buildHomeRM();buildHomeNext();curSess=null;
@@ -756,6 +899,217 @@ function toggleMait(sessId,exIdx,el){
   const k='pp_mait_'+sessId+'_'+exIdx;const dn=ls(k)!=='1';
   ss(k,dn?'1':'0');el.classList.toggle('on',dn);
   el.querySelector('.mait-star').textContent=dn?'★':'☆';
+}
+
+/* ══════════════════════════════════════════════
+   COMMENTAIRES & NOTES
+══════════════════════════════════════════════ */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function fmtTime(ts){
+  const d=Date.now()-ts;
+  if(d<60000)return'À l\'instant';
+  if(d<3600000)return Math.floor(d/60000)+'min';
+  if(d<86400000)return Math.floor(d/3600000)+'h';
+  const dt=new Date(ts);return dt.getDate()+'/'+(dt.getMonth()+1)+' '+String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0');
+}
+function getComms(sid){return JSON.parse(ls('pp_comm_'+sid)||'[]');}
+function saveComms(sid,arr){ss('pp_comm_'+sid,JSON.stringify(arr));}
+
+function buildCommMain(pid,sess){
+  const sid=sess.id;
+  const note=ls('pp_note_'+sid)||'';
+  const el=document.getElementById('comm-main');
+  if(!el)return;
+  el.innerHTML=`
+<div class="note-wrap">
+  <div class="note-lbl">Notes personnelles</div>
+  <textarea class="note-area" id="note-${sid}" placeholder="Ressenti, douleurs, progrès... sauvegarde automatique">${esc(note)}</textarea>
+  <div class="note-saved" id="note-saved-${sid}"></div>
+</div>
+<div class="comm-wrap">
+  <div class="comm-section-lbl">Commentaires</div>
+  <div class="comm-composer">
+    <div class="comm-av">MH</div>
+    <div class="comm-right">
+      <textarea class="comm-input" id="cinp-${sid}" placeholder="Ajoute un commentaire sur cette séance..." rows="1" oninput="autoRes(this)"></textarea>
+      <button class="comm-send" onclick="pubComm('${sid}')">Publier →</button>
+    </div>
+  </div>
+  <div class="comm-list" id="clist-${sid}"></div>
+</div>
+<div class="ai-btn-wrap">
+  <button class="ai-btn" onclick="openAI('${pid}','${sid}')">
+    <div class="ai-ic">✨</div>
+    <div class="ai-txt"><div class="ai-title">Optimiser avec l'IA</div><div class="ai-sub">Analyse et propose des ajustements personnalisés</div></div>
+    <div class="ai-arr">→</div>
+  </button>
+</div>`;
+  renderComms(sid);
+  setupNoteAutosave(sid);
+}
+
+function renderComms(sid){
+  const list=document.getElementById('clist-'+sid);
+  if(!list)return;
+  const comms=getComms(sid);
+  if(!comms.length){list.innerHTML='<div class="comm-empty">Aucun commentaire · Partage ton ressenti ✨</div>';return;}
+  list.innerHTML=comms.map((c,i)=>`
+<div class="comm-item">
+  <div class="comm-av">MH</div>
+  <div class="comm-body">
+    <div class="comm-name">Marjana</div>
+    <div class="comm-text">${esc(c.content)}</div>
+    <div class="comm-meta">
+      <span class="comm-time">${fmtTime(c.ts)}</span>
+      <button class="comm-like${c.liked?' on':''}" onclick="likeComm('${sid}',${i})">${c.liked?'♥':'♡'} ${c.likes||0}</button>
+      <button class="comm-reply-btn" onclick="replyComm('${sid}',${i})">Répondre</button>
+    </div>
+    ${c.reply?`<div class="comm-reply-box">↩ ${esc(c.reply)}</div>`:''}
+  </div>
+</div>`).join('');
+}
+
+function autoRes(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
+
+function pubComm(sid){
+  const inp=document.getElementById('cinp-'+sid);
+  const txt=(inp?.value||'').trim();
+  if(!txt)return;
+  const comms=getComms(sid);
+  comms.unshift({id:Date.now(),content:txt,ts:Date.now(),likes:0,liked:false,reply:null});
+  saveComms(sid,comms);
+  inp.value='';inp.style.height='';
+  renderComms(sid);
+  showToast('Commentaire publié ✓');
+}
+
+function likeComm(sid,idx){
+  const comms=getComms(sid);
+  if(!comms[idx])return;
+  comms[idx].liked=!comms[idx].liked;
+  comms[idx].likes=(comms[idx].likes||0)+(comms[idx].liked?1:-1);
+  saveComms(sid,comms);renderComms(sid);
+}
+
+function replyComm(sid,idx){
+  const r=prompt('Répondre à ce commentaire :');
+  if(!r)return;
+  const comms=getComms(sid);
+  if(!comms[idx])return;
+  comms[idx].reply=r;
+  saveComms(sid,comms);renderComms(sid);
+}
+
+function setupNoteAutosave(sid){
+  const el=document.getElementById('note-'+sid);
+  const saved=document.getElementById('note-saved-'+sid);
+  if(!el)return;
+  let t;
+  el.addEventListener('input',()=>{
+    clearTimeout(t);
+    if(saved)saved.textContent='';
+    t=setTimeout(()=>{
+      ss('pp_note_'+sid,el.value);
+      if(saved){saved.textContent='Sauvegardé ✓';setTimeout(()=>{saved.textContent='';},2000);}
+    },700);
+  });
+}
+
+/* ══════════════════════════════════════════════
+   IA
+══════════════════════════════════════════════ */
+const AI_DATA={
+  hs:[
+    {lbl:'Intensité',txt:'Augmente le temps de maintien à 55 secondes sur les 3 premières séries — ton endurance est prête pour cette progression.'},
+    {lbl:'Récupération',txt:'Réduis le repos à 90 secondes entre les séries. La qualité reste suffisante et tu renforces l\'endurance musculaire.'},
+    {lbl:'Ajout recommandé',txt:'3 séries de "Kick to handstand" · 5 reps chacune. Focus sur la perception spatiale et la ligne du corps.'}
+  ],
+  pr:[
+    {lbl:'Surcharge progressive',txt:'Ajoute 1 répétition sur chaque série pour les exercices où tu atteins 100% de maîtrise.'},
+    {lbl:'Ordre optimal',txt:'Commence par les tractions australiennes en début de séance quand tu es fraîche — c\'est l\'exercice clé pour tes dorsaux.'},
+    {lbl:'Volume',txt:'Sur les dips négatifs, ralentis la phase excentrique à 4 secondes. Plus efficace que d\'augmenter les reps.'}
+  ]
+};
+let _aiCtx=null;
+function openAI(pid,sid){
+  _aiCtx={pid,sid};
+  const panel=document.getElementById('ai-panel');
+  const res=document.getElementById('ai-result');
+  const load=document.getElementById('ai-loading');
+  if(res)res.style.display='none';
+  if(load)load.style.display='flex';
+  panel.classList.add('on');
+  setTimeout(()=>{
+    if(load)load.style.display='none';
+    if(res){
+      res.style.display='block';
+      const suggs=AI_DATA[pid]||AI_DATA.hs;
+      document.getElementById('ai-sugg-list').innerHTML=suggs.map((s,i)=>`
+<div class="ai-sugg" style="animation-delay:${i*.08}s">
+  <div class="ai-sugg-lbl">${s.lbl}</div>
+  <div class="ai-sugg-txt">${s.txt}</div>
+</div>`).join('');
+    }
+  },1600);
+}
+function closeAI(){document.getElementById('ai-panel')?.classList.remove('on');}
+function acceptAI(){closeAI();showToast('Suggestions appliquées ✨');}
+
+/* ══════════════════════════════════════════════
+   ÉDITION SÉANCE
+══════════════════════════════════════════════ */
+function openEditSession(){
+  if(!curSess)return;
+  const{pid,sessId}=curSess;
+  const sess=SESSIONS[pid].sessions.find(s=>s.id===sessId);
+  if(!sess)return;
+  const custom=JSON.parse(ls('pp_custom_'+sessId)||'null');
+  const exs=custom||sess.exercises;
+  const ns=NS[pid];
+  const cont=document.getElementById('edit-cont');
+  cont.innerHTML=exs.map((ex,i)=>{
+    if(!ex)return`<div class="edit-card" style="opacity:.4"><div class="edit-idx">Exercice ${i+1}</div><div style="font-size:13px;color:rgba(17,17,17,.35)">Non encore défini par le coach</div></div>`;
+    return`<div class="edit-card">
+<div class="edit-idx">Exercice ${i+1}</div>
+<input class="edit-field" data-i="${i}" data-f="name" value="${esc(ex.name||'')}" placeholder="Nom de l'exercice"/>
+<div class="edit-row">
+  <input class="edit-field" data-i="${i}" data-f="series" value="${esc(ex.series||'')}" placeholder="Séries"/>
+  <input class="edit-field" data-i="${i}" data-f="reps" value="${esc(ex.reps||'')}" placeholder="Reps / Temps"/>
+</div>
+<input class="edit-field" data-i="${i}" data-f="note" value="${esc(ex.note||'')}" placeholder="Note coach (optionnel)"/>
+<input class="edit-field" data-i="${i}" data-f="video" value="${esc(ex.video||'')}" placeholder="Lien vidéo (optionnel)"/>
+</div>`;
+  }).join('');
+  document.getElementById('edit-overlay').classList.add('on');
+}
+function closeEditSession(){document.getElementById('edit-overlay')?.classList.remove('on');}
+function saveEditSession(){
+  if(!curSess)return;
+  const{pid,sessId}=curSess;
+  const sess=SESSIONS[pid].sessions.find(s=>s.id===sessId);
+  const result=sess.exercises.map((ex,i)=>{
+    const n=v=>document.querySelector(`[data-i="${i}"][data-f="${v}"]`)?.value||'';
+    if(!ex&&!n('name'))return null;
+    return{name:n('name')||ex?.name||'',series:n('series')||ex?.series||'',reps:n('reps')||ex?.reps||'',note:n('note')||ex?.note||'',video:n('video')||ex?.video||null};
+  });
+  ss('pp_custom_'+sessId,JSON.stringify(result));
+  const updated={...sess,exercises:result};
+  buildEx(pid,updated);
+  closeEditSession();
+  showToast('Séance enregistrée ✓');
+}
+
+/* ══════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════ */
+function showToast(msg){
+  const t=document.createElement('div');
+  t.className='toast';t.textContent=msg;
+  t.style.opacity='0';t.style.transition='opacity .28s ease,transform .28s ease';
+  t.style.transform='translateX(-50%) translateY(8px)';
+  document.body.appendChild(t);
+  requestAnimationFrame(()=>{t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';});
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(8px)';setTimeout(()=>t.remove(),350);},2200);
 }
 </script>
 </body>
