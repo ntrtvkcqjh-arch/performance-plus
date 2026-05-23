@@ -1005,6 +1005,7 @@ function goTab(id){
 
 /* GREETING */
 function getGreeting(){
+  if(isCoach()) return['Bonsoir Julian 👋','Tableau de bord coach · Performance+'];
   const h=new Date().getHours();
   if(h>=5&&h<12)  return['Bonjour Marjana ☀️','Prête à attaquer la journée ? 💪'];
   if(h>=12&&h<14) return['Bon appétit Marjana 🌟','Recharge bien, la suite t\'attend ⚡'];
