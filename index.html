@@ -399,6 +399,12 @@ body.app-on #cv{opacity:0}
 /* ── MODIFY BUTTON (navbar) ── */
 .nb-edit{background:none;border:1px solid var(--b);border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g);cursor:pointer;font-family:inherit;transition:all .2s}
 .nb-edit:active{background:var(--g-dim)}
+/* ── ADD BLOCK BUTTON ── */
+.add-block-btn{display:block;width:100%;background:none;border:1px dashed rgba(17,17,17,.15);border-radius:14px;padding:16px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(17,17,17,.4);cursor:pointer;font-family:inherit;margin-top:4px;transition:all .2s}
+.add-block-btn:active{background:rgba(17,17,17,.04)}
+/* ── COACH EDIT DELETE ── */
+.edit-del{float:right;background:none;border:none;cursor:pointer;font-size:18px;color:rgba(17,17,17,.25);padding:0 0 4px 8px;line-height:1;transition:color .18s}
+.edit-del:active{color:#E05050}
 
 /* ── TOAST ── */
 .toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);left:50%;transform:translateX(-50%);background:#111;color:#FAF7F2;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;letter-spacing:.04em;z-index:999;white-space:nowrap;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.25)}
@@ -462,8 +468,17 @@ body.app-on #cv{opacity:0}
 
     <!-- ROADMAP -->
     <div class="screen" id="s-roadmap">
-      <div class="nb"><div class="nb-mark">P+</div><div class="nb-title" id="rm-title">Roadmap</div><div class="nb-sp"></div></div>
+      <div class="nb"><div class="nb-mark">P+</div><div class="nb-title" id="rm-title">Roadmap</div><button class="nb-edit" onclick="openEditRoadmap()">Modifier</button></div>
       <div class="sc"><div id="phases"></div></div>
+      <!-- Edit overlay objectifs -->
+      <div class="edit-overlay" id="rm-edit-overlay">
+        <div class="edit-nb">
+          <button class="edit-cancel" onclick="closeEditRoadmap()">Annuler</button>
+          <div class="edit-ttl">Objectifs</div>
+          <button class="edit-ok" onclick="saveEditRoadmap()">Enregistrer</button>
+        </div>
+        <div class="edit-sc"><div id="rm-edit-cont"></div></div>
+      </div>
     </div>
 
     <!-- SÉANCES -->
@@ -482,31 +497,16 @@ body.app-on #cv{opacity:0}
 
     <!-- COACH -->
     <div class="screen" id="s-coach">
-      <div class="nb"><div class="nb-mark">P+</div><div class="nb-title">Coach</div><div class="nb-sp"></div></div>
-      <div class="sc">
-        <div class="coach-block">
-          <div class="coach-title">🤸 Handstand — Protocole</div>
-          <div class="coach-body">Séances de <strong style="color:var(--t)">20 minutes</strong>, entre 8 et 12 par semaine. Parfois 2 par jour. 20 minutes c'est rien — c'est enlever 20 min de scroll TikTok.</div>
-          <div class="coach-links">
-            <a class="coach-link" href="https://www.youtube.com/watch?v=wQInEf1r50g" target="_blank">↗ Échauffement poignets</a>
-            <a class="coach-link" href="https://calendly.com/julian-geroudet/bilan-offfert" target="_blank">↗ Agenda coach</a>
-          </div>
+      <div class="nb"><div class="nb-mark">P+</div><div class="nb-title">Coach</div><button class="nb-edit" onclick="openEditCoach()">Modifier</button></div>
+      <div class="sc"><div id="coach-cont"></div></div>
+      <!-- Edit overlay coach -->
+      <div class="edit-overlay" id="coach-edit-overlay">
+        <div class="edit-nb">
+          <button class="edit-cancel" onclick="closeEditCoach()">Annuler</button>
+          <div class="edit-ttl">Infos coach</div>
+          <button class="edit-ok" onclick="saveEditCoach()">Enregistrer</button>
         </div>
-        <div class="coach-block">
-          <div class="coach-title">Qualité · Priorité absolue</div>
-          <div class="coach-body">Pas de spam. Concentration maximale sur chaque essai. La qualité crée la progression, pas la quantité.</div>
-        </div>
-        <div class="coach-block">
-          <div class="coach-title">💪 Programme force — Protocole</div>
-          <div class="coach-body">Remplis tes performances à chaque séance. Le coach regarde chaque semaine et donne des objectifs hebdomadaires.</div>
-          <div class="coach-links">
-            <a class="coach-link" href="https://youtube.com/shorts/GLio_cGJalk?feature=share" target="_blank">↗ Échauffement spécifique</a>
-          </div>
-        </div>
-        <div class="coach-block">
-          <div class="coach-title">Questions</div>
-          <div class="coach-body">Pour toute question sur un exercice — ou si une position semble risquée — envoie un message WhatsApp au coach.</div>
-        </div>
+        <div class="edit-sc"><div id="coach-edit-cont"></div><button class="add-block-btn" onclick="addCoachBlock()">+ Ajouter un bloc</button></div>
       </div>
     </div>
 
@@ -636,6 +636,14 @@ const SESSIONS={
 };
 const NS={hs:6,pr:4};
 
+/* COACH DEFAULT DATA */
+const COACH_DEFAULT=[
+  {title:'🤸 Handstand — Protocole',body:"Séances de 20 minutes, entre 8 et 12 par semaine. Parfois 2 par jour. 20 minutes c'est rien — c'est enlever 20 min de scroll TikTok.",links:[{l:'↗ Échauffement poignets',u:'https://www.youtube.com/watch?v=wQInEf1r50g'},{l:'↗ Agenda coach',u:'https://calendly.com/julian-geroudet/bilan-offfert'}]},
+  {title:'Qualité · Priorité absolue',body:"Pas de spam. Concentration maximale sur chaque essai. La qualité crée la progression, pas la quantité.",links:[]},
+  {title:'💪 Programme force — Protocole',body:"Remplis tes performances à chaque séance. Le coach regarde chaque semaine et donne des objectifs hebdomadaires.",links:[{l:'↗ Échauffement spécifique',u:'https://youtube.com/shorts/GLio_cGJalk?feature=share'}]},
+  {title:'Questions',body:"Pour toute question sur un exercice — ou si une position semble risquée — envoie un message WhatsApp au coach.",links:[]}
+];
+
 /* STATE */
 let curTab='home',curProg=null,curSess=null;
 const ls=k=>localStorage.getItem(k);
@@ -738,7 +746,88 @@ function buildGreeting(){
 }
 
 function buildAll(){
-  buildGreeting();buildRoadmap();buildHomeRM();buildHomeNext();updateStats();buildProgGrid();
+  buildGreeting();buildRoadmap();buildHomeRM();buildHomeNext();updateStats();buildProgGrid();buildCoach();
+}
+
+/* ── COACH ── */
+function getCoachData(){const s=ls('pp_coach');return s?JSON.parse(s):COACH_DEFAULT;}
+function buildCoach(){
+  const data=getCoachData();
+  const c=document.getElementById('coach-cont');if(!c)return;
+  c.innerHTML=data.map(b=>`
+<div class="coach-block">
+  <div class="coach-title">${esc(b.title)}</div>
+  <div class="coach-body">${esc(b.body)}</div>
+  ${b.links?.length?`<div class="coach-links">${b.links.map(lk=>`<a class="coach-link" href="${esc(lk.u)}" target="_blank">${esc(lk.l)}</a>`).join('')}</div>`:''}
+</div>`).join('');
+}
+
+let _coachEditData=[];
+function openEditCoach(){
+  _coachEditData=JSON.parse(JSON.stringify(getCoachData()));
+  renderCoachEditBlocks();
+  document.getElementById('coach-edit-overlay').classList.add('on');
+}
+function renderCoachEditBlocks(){
+  const cont=document.getElementById('coach-edit-cont');
+  cont.innerHTML=_coachEditData.map((b,i)=>`
+<div class="edit-card" id="ceb-${i}">
+  <div class="edit-idx">Bloc ${i+1} <button class="edit-del" onclick="delCoachBlock(${i})" title="Supprimer">×</button></div>
+  <input class="edit-field" data-cb="${i}" data-cf="title" value="${esc(b.title||'')}" placeholder="Titre du bloc"/>
+  <textarea class="edit-field" data-cb="${i}" data-cf="body" rows="4" style="resize:vertical;min-height:80px">${esc(b.body||'')}</textarea>
+  <input class="edit-field" data-cb="${i}" data-cf="link0l" value="${esc(b.links?.[0]?.l||'')}" placeholder="Lien 1 — texte (ex: ↗ Vidéo)"/>
+  <input class="edit-field" data-cb="${i}" data-cf="link0u" value="${esc(b.links?.[0]?.u||'')}" placeholder="Lien 1 — URL"/>
+  <input class="edit-field" data-cb="${i}" data-cf="link1l" value="${esc(b.links?.[1]?.l||'')}" placeholder="Lien 2 — texte (optionnel)"/>
+  <input class="edit-field" data-cb="${i}" data-cf="link1u" value="${esc(b.links?.[1]?.u||'')}" placeholder="Lien 2 — URL (optionnel)"/>
+</div>`).join('');
+}
+function addCoachBlock(){
+  _coachEditData.push({title:'',body:'',links:[]});
+  renderCoachEditBlocks();
+  // scroll to new block
+  const sc=document.querySelector('#coach-edit-overlay .edit-sc');
+  if(sc)setTimeout(()=>sc.scrollTo({top:sc.scrollHeight,behavior:'smooth'}),50);
+}
+function delCoachBlock(i){
+  _coachEditData.splice(i,1);
+  renderCoachEditBlocks();
+}
+function closeEditCoach(){document.getElementById('coach-edit-overlay')?.classList.remove('on');}
+function saveEditCoach(){
+  _coachEditData.forEach((b,i)=>{
+    const g=f=>document.querySelector(`[data-cb="${i}"][data-cf="${f}"]`)?.value||'';
+    b.title=g('title');b.body=g('body');
+    b.links=[];
+    const l0l=g('link0l'),l0u=g('link0u');if(l0l&&l0u)b.links.push({l:l0l,u:l0u});
+    const l1l=g('link1l'),l1u=g('link1u');if(l1l&&l1u)b.links.push({l:l1l,u:l1u});
+  });
+  ss('pp_coach',JSON.stringify(_coachEditData));
+  buildCoach();
+  closeEditCoach();
+  showToast('Infos coach enregistrées ✓');
+}
+
+/* ── ÉDITION OBJECTIFS ── */
+function openEditRoadmap(){
+  const cont=document.getElementById('rm-edit-cont');
+  cont.innerHTML=PHASES.map(ph=>`
+<div class="edit-card">
+  <div class="edit-idx">${ph.num} — ${ph.name.toUpperCase()}</div>
+  ${ph.objectifs.map((o,i)=>`<input class="edit-field" data-ph="${ph.id}" data-oi="${i}" value="${esc(getObjTxt(ph.id,i,o))}" placeholder="Objectif ${i+1}"/>`).join('')}
+</div>`).join('');
+  document.getElementById('rm-edit-overlay').classList.add('on');
+}
+function closeEditRoadmap(){document.getElementById('rm-edit-overlay')?.classList.remove('on');}
+function saveEditRoadmap(){
+  PHASES.forEach(ph=>{
+    ph.objectifs.forEach((_,i)=>{
+      const el=document.querySelector(`[data-ph="${ph.id}"][data-oi="${i}"]`);
+      if(el)ss('pp_obj_txt_'+ph.id+'_'+i,el.value);
+    });
+  });
+  closeEditRoadmap();
+  buildRoadmap();buildHomeRM();updateStats();
+  showToast('Objectifs enregistrés ✓');
 }
 
 /* STATS */
@@ -776,9 +865,13 @@ function buildHomeNext(){
 }
 
 /* ROADMAP */
+function getObjTxt(phId,idx,defaultTxt){const c=ls('pp_obj_txt_'+phId+'_'+idx);return c!==null?c:defaultTxt;}
 function phStats(ph){
-  const real=ph.objectifs.filter(o=>o!=='').length;
-  let done=0;ph.objectifs.forEach((o,i)=>{if(o&&ls('pp_obj_'+ph.id+'_'+i)==='1')done++;});
+  let real=0,done=0;
+  ph.objectifs.forEach((o,i)=>{
+    const txt=getObjTxt(ph.id,i,o);
+    if(txt){real++;if(ls('pp_obj_'+ph.id+'_'+i)==='1')done++;}
+  });
   return{done,real};
 }
 function buildRoadmap(){
@@ -789,9 +882,10 @@ function buildRoadmap(){
     const pct=real>0?done/real*100:0;
     const card=document.createElement('div');card.className='ph-card';card.id='ph-'+ph.id;
     const objsH=ph.objectifs.map((o,idx)=>{
-      if(!o)return`<div class="obj-empty">— Objectif à définir</div>`;
+      const txt=getObjTxt(ph.id,idx,o);
+      if(!txt)return`<div class="obj-empty" onclick="openEditRoadmap()" style="cursor:pointer">— Appuie sur Modifier pour définir →</div>`;
       const dn=ls('pp_obj_'+ph.id+'_'+idx)==='1';
-      return`<div class="obj-row${dn?' done':''}" onclick="toggleObj('${ph.id}',${idx})"><div class="obj-dot">${dn?'✓':''}</div><div class="obj-txt">${o}</div></div>`;
+      return`<div class="obj-row${dn?' done':''}" onclick="toggleObj('${ph.id}',${idx})"><div class="obj-dot">${dn?'✓':''}</div><div class="obj-txt">${esc(txt)}</div></div>`;
     }).join('');
     card.innerHTML=`<div class="ph-head" onclick="togglePhase('${ph.id}')"><div class="ph-n">${ph.num}</div><div class="ph-info"><div class="ph-info-name">${ph.name.toUpperCase()}</div><div class="ph-info-sub">${real>0?real+' objectifs':'À définir'}</div></div><div class="ph-ct">${done}/${real||5}</div><div class="ph-chev">›</div></div><div class="ph-track"><div class="ph-fill" style="width:${pct}%;background:${ph.color}"></div></div><div class="ph-objs">${objsH}</div>`;
     c.appendChild(card);
