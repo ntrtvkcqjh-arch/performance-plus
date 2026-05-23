@@ -406,6 +406,25 @@ body.app-on #cv{opacity:0}
 .edit-del{float:right;background:none;border:none;cursor:pointer;font-size:18px;color:rgba(17,17,17,.25);padding:0 0 4px 8px;line-height:1;transition:color .18s}
 .edit-del:active{color:#E05050}
 
+/* ── COMMENTAIRES PAR EXERCICE ── */
+.ex-comm{padding:14px 24px 6px;border-top:1px solid var(--b);margin-top:4px}
+.ex-comm-list{display:flex;flex-direction:column;gap:7px;margin-bottom:10px}
+.ex-comm-item{background:var(--s1);border:1px solid var(--b);border-radius:11px;padding:10px 13px;animation:fadeUp .22s ease both;position:relative}
+.ex-comm-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.ex-comm-who{font-size:10px;font-weight:700;color:var(--g);letter-spacing:.08em}
+.ex-comm-when{font-size:10px;color:var(--t3)}
+.ex-comm-txt{font-size:13px;color:var(--t);line-height:1.55;word-break:break-word}
+.ex-comm-del{background:none;border:none;cursor:pointer;font-size:15px;color:var(--t3);padding:0 0 0 8px;line-height:1;transition:color .18s;flex-shrink:0}
+.ex-comm-del:active{color:#E05050}
+.ex-comm-compose{display:flex;gap:9px;align-items:flex-start}
+.ex-comm-av{width:28px;height:28px;border-radius:50%;background:var(--g-dim);border:1.5px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--g);flex-shrink:0;margin-top:2px}
+.ex-comm-right{flex:1;min-width:0}
+.ex-comm-input{width:100%;background:var(--s1);border:1px solid var(--b);border-radius:11px;padding:9px 13px;font-size:13px;color:var(--t);font-family:inherit;resize:none;outline:none;overflow:hidden;line-height:1.5;transition:border-color .22s,box-shadow .22s;min-height:36px;max-height:100px;display:block}
+.ex-comm-input:focus{border-color:var(--g2);box-shadow:0 0 0 3px rgba(233,185,73,.14)}
+.ex-comm-input::placeholder{color:var(--t3);font-size:12px}
+.ex-comm-send{display:none;margin-top:6px;background:var(--g2);border:none;border-radius:9px;padding:7px 14px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#5A3A00;cursor:pointer;font-family:inherit;transition:opacity .15s,transform .15s;float:right}
+.ex-comm-send:active{opacity:.75;transform:scale(.97)}
+
 /* ── PIÈCES JOINTES (vidéos) ── */
 .attach-wrap{padding:20px 22px 4px;border-top:1px solid var(--b)}
 .attach-lbl{font-size:9px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);margin-bottom:12px;display:flex;align-items:center;gap:10px}
@@ -1116,9 +1135,20 @@ function buildEx(pid,sess){
     let sH='';for(let s=0;s<ns;s++){const dn=!!sets[s];sH+=`<button class="set-btn${dn?' on':''}" onclick="toggleSet('${sess.id}',${idx},${s},${ns},this)">${dn?'✓':(s+1)}</button>`;}
     const nH=ex.note?`<div class="ex-note"><div class="ex-note-txt">${ex.note.replace(/\n/g,'<br>')}</div></div>`:'';
     const vH=ex.video?`<a class="ex-vid" href="${ex.video}" target="_blank">↗ Vidéo</a>`:'';
+    const commH=`<div class="ex-comm">
+  <div class="ex-comm-list" id="excl-${sess.id}-${idx}"></div>
+  <div class="ex-comm-compose">
+    <div class="ex-comm-av">MH</div>
+    <div class="ex-comm-right">
+      <textarea class="ex-comm-input" id="excinp-${sess.id}-${idx}" placeholder="Commenter cet exercice..." rows="1" oninput="autoResEx(this)"></textarea>
+      <button class="ex-comm-send" onclick="pubExComm('${sess.id}',${idx})">Envoyer →</button>
+    </div>
+  </div>
+</div>`;
     const card=document.createElement('div');card.className='ex-card';
-    card.innerHTML=`<div class="ex-head"><div class="ex-idx">${idx+1}</div><div class="ex-info"><div class="ex-name">${ex.name}</div><div class="ex-metas"><div class="ex-meta">Séries <span>${ex.series}</span></div><div class="ex-meta">Reps <span>${ex.reps}</span></div></div></div></div>${nH}${vH}<div class="ex-sets"><div class="ex-sets-lbl">Sets</div>${sH}<div class="mait-btn${mait?' on':''}" onclick="toggleMait('${sess.id}',${idx},this)"><span class="mait-star">${mait?'★':'☆'}</span> Maîtrisé</div></div>`;
+    card.innerHTML=`<div class="ex-head"><div class="ex-idx">${idx+1}</div><div class="ex-info"><div class="ex-name">${ex.name}</div><div class="ex-metas"><div class="ex-meta">Séries <span>${ex.series}</span></div><div class="ex-meta">Reps <span>${ex.reps}</span></div></div></div></div>${nH}${vH}<div class="ex-sets"><div class="ex-sets-lbl">Sets</div>${sH}<div class="mait-btn${mait?' on':''}" onclick="toggleMait('${sess.id}',${idx},this)"><span class="mait-star">${mait?'★':'☆'}</span> Maîtrisé</div></div>${commH}`;
     c.appendChild(card);
+    renderExComms(sess.id,idx);
   });
   if(!any)c.innerHTML='<div class="ex-empty">Séance à définir par le coach.<br>Reviens bientôt.</div>';
 }
@@ -1380,6 +1410,47 @@ function saveEditSession(){
   buildEx(pid,{...sess,exercises:result});
   closeEditSession();
   showToast('Séance enregistrée ✓');
+}
+
+/* ══════════════════════════════════════════════
+   COMMENTAIRES PAR EXERCICE
+══════════════════════════════════════════════ */
+function getExComms(sid,i){return JSON.parse(ls('pp_exc_'+sid+'_'+i)||'[]');}
+function saveExComms(sid,i,arr){ss('pp_exc_'+sid+'_'+i,JSON.stringify(arr));}
+function renderExComms(sid,i){
+  const list=document.getElementById('excl-'+sid+'-'+i);
+  if(!list)return;
+  const comms=getExComms(sid,i);
+  if(!comms.length){list.innerHTML='';return;}
+  list.innerHTML=comms.map((c,ci)=>`
+<div class="ex-comm-item">
+  <div class="ex-comm-hd">
+    <span class="ex-comm-who">MH</span>
+    <span style="display:flex;align-items:center;gap:6px"><span class="ex-comm-when">${fmtTime(c.ts)}</span><button class="ex-comm-del" onclick="delExComm('${sid}',${i},${ci})">×</button></span>
+  </div>
+  <div class="ex-comm-txt">${esc(c.content)}</div>
+</div>`).join('');
+}
+function autoResEx(el){
+  el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';
+  const btn=el.closest('.ex-comm-right')?.querySelector('.ex-comm-send');
+  if(btn)btn.style.display=el.value.trim()?'block':'none';
+}
+function pubExComm(sid,i){
+  const inp=document.getElementById('excinp-'+sid+'-'+i);
+  const txt=(inp?.value||'').trim();if(!txt)return;
+  const comms=getExComms(sid,i);
+  comms.push({id:Date.now(),content:txt,ts:Date.now()});
+  saveExComms(sid,i,comms);
+  inp.value='';inp.style.height='';
+  const btn=inp?.closest('.ex-comm-right')?.querySelector('.ex-comm-send');
+  if(btn)btn.style.display='none';
+  renderExComms(sid,i);
+  showToast('Commentaire ajouté ✓');
+}
+function delExComm(sid,i,ci){
+  const comms=getExComms(sid,i);comms.splice(ci,1);
+  saveExComms(sid,i,comms);renderExComms(sid,i);
 }
 
 /* ══════════════════════════════════════════════
