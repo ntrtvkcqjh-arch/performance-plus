@@ -613,25 +613,43 @@ const PHASES=[
 ];
 const SESSIONS={
   hs:{name:'Handstand',icon:'🤸',color:'#A878C9',sub:'Suivi personnalisé · 20 min/séance',sessions:[
-    {id:'hs1',num:1,mission:"Premier cycle : construire de la force dans les épaules, pas d'équilibre que de la force. Si t'as la moindre question sur un exercice envoie-la moi par WhatsApp.",exercises:[
-      {name:'Handstand dos au mur',series:'8',reps:'45 sec',note:"2 min de repos\n\nNe cherche pas l'équilibre, juste pose-toi sur le mur et tiens. La position : dos contre le mur pour renforcer les épaules.",video:null},
+    {id:'hs1',num:1,name:'Séance 1',mission:"Premier cycle : construire de la force dans les épaules, pas d'équilibre — que de la force. Si t'as la moindre question sur un exercice envoie-la moi par WhatsApp.",exercises:[
+      {name:'Handstand dos au mur',series:'8',reps:'45 sec',note:"2 min de repos\n\nNe cherche pas l'équilibre, juste pose-toi sur le mur et tiens. Dos contre le mur — c'est la position pour renforcer les épaules.",video:null},
       {name:'Handstand dos au mur — Travail du grip',series:'4',reps:'3 reps',note:'1 min de repos',video:'https://www.youtube.com/watch?v=5IXOpjh-RVY'},
       null,null,null,null,null
     ]},
-    {id:'hs2',num:2,mission:null,exercises:[
-      {name:'Handstand ventre au mur',series:'10',reps:'15 sec',note:"1 min de repos\n\nPlace tes mains à 20–30 cm du mur. L'objectif : force dans les épaules, pas encore l'équilibre.",video:'https://www.youtube.com/watch?v=fSwLVRnBROg'},
-      {name:'Wall walk',series:'4',reps:'3 reps',note:"1 min de repos\n\nApprendre à bien se mettre en position ventre au mur en économisant sa force.",video:'https://www.youtube.com/watch?v=5GdCFunkYGM'},
+    {id:'hs2',num:2,name:'Séance 2',mission:null,exercises:[
+      {name:'Handstand ventre au mur',series:'10',reps:'15 sec',note:"1 min de repos\n\nPlace tes mains à 20–30 cm du mur pour éviter de basculer vers l'avant.\n\nL'objectif : prendre de la force dans les épaules, pas encore l'équilibre.",video:'https://www.youtube.com/watch?v=fSwLVRnBROg'},
+      {name:'Wall walk',series:'4',reps:'3 reps',note:"1 min de repos\n\nApprendre à bien se mettre en position ventre au mur en économisant sa force (l'exécution est dans la vidéo).",video:'https://www.youtube.com/watch?v=5GdCFunkYGM'},
       null,null,null,null,null
     ]},
-    {id:'hs3',num:3,mission:null,exercises:[null,null,null,null,null,null,null]},
-    {id:'hs4',num:4,mission:null,exercises:[null,null,null,null,null,null,null]}
+    {id:'hs3',num:3,name:'Séance 3',mission:null,exercises:[null,null,null,null,null,null,null]},
+    {id:'hs4',num:4,name:'Séance 4',mission:null,exercises:[null,null,null,null,null,null,null]}
   ]},
   pr:{name:'Programme',icon:'💪',color:'#D4AF6E',sub:'Force & Calisthénie · Track tes perfs',sessions:[
-    {id:'pr1',num:1,mission:null,exercises:[null,null,null,null,null,null,null]},
-    {id:'pr2',num:2,mission:null,exercises:[null,null,null,null,null,null,null]},
-    {id:'pr3',num:3,mission:null,exercises:[null,null,null,null,null,null,null]},
-    {id:'pr4',num:4,mission:null,exercises:[null,null,null,null,null,null,null]},
-    {id:'pr5',num:5,mission:null,exercises:[null,null,null,null,null,null,null]}
+    {id:'pr1',num:1,name:'Intensité',mission:null,exercises:[
+      {name:'Tractions australiennes',series:'3',reps:'Max',note:"5 min de repos\n\nOn est sur la semaine test donc essaye ton max.",video:'https://www.youtube.com/watch?v=hkEiWV1aKIY'},
+      {name:'Pompes',series:'3',reps:'Max',note:"5 min de repos\n\nJe connais pas ton max donc vise 10 répétitions cette semaine et on adapte la semaine prochaine.\n\nSi tu vois que tu peux faire plus, tu fais plus !",video:'https://www.youtube.com/watch?v=hiSoCZ6yzQk'},
+      {name:'Toes to bar',series:'3',reps:'Max',note:"4 min de repos\n\nSi c'est trop dur ne montes pas plus haut que l'horizontale et plie les genoux.",video:'https://youtube.com/shorts/VW-BLvp8FvM?feature=share'},
+      {name:'Tirage verticale',series:'3',reps:'3',note:"4 min de repos\n\nCommence à 30 kg et augmente si c'est trop facile.",video:'https://www.youtube.com/watch?v=5sHJ5Z0eHi8'},
+      null,null,null
+    ]},
+    {id:'pr2',num:2,name:'Volume Lourd',mission:null,exercises:[
+      {name:'EMOM Tractions australiennes 15 min',series:'15',reps:'3',note:"Pendant 15 minutes, chaque minute tu fais 3 tractions.\n\nDonc en tout ça fait 45 tractions australiennes.",video:'https://www.youtube.com/watch?v=hkEiWV1aKIY'},
+      {name:'EMOM Pompes',series:'15',reps:'3',note:"Pendant 15 minutes, chaque minute tu fais 3 pompes.\n\nDonc en tout ça fait 45 pompes.",video:'https://www.youtube.com/watch?v=hiSoCZ6yzQk'},
+      {name:'Gainage banane',series:'6',reps:'30 sec',note:'1 min de repos',video:'https://youtube.com/shorts/Ay39O4w6RIk?feature=share'},
+      {name:'Sit-up',series:'6',reps:'10',note:'1 min de repos',video:'https://youtube.com/shorts/GE334iOZRR8?feature=share'},
+      null,null,null
+    ]},
+    {id:'pr3',num:3,name:'Volume léger',mission:null,exercises:[
+      {name:'Tractions scapulaire',series:'6',reps:'3',note:'2 min de repos',video:'https://www.youtube.com/watch?v=S4g6hWP6o94'},
+      {name:'Pompes',series:'4',reps:'10 + Max',note:"4 min de repos\n\nTu fais 10 pompes, tu prends 30 secondes de repos puis tu fais ton max de pompes.",video:'https://www.youtube.com/watch?v=hiSoCZ6yzQk'},
+      {name:'Tirage verticale',series:'4',reps:'6',note:"3 min de repos\n\nPrends une charge qui te permet de faire 6 répétitions.\n\nCommence à 30 kg puis augmente si c'est trop facile.",video:'https://www.youtube.com/watch?v=5sHJ5Z0eHi8'},
+      {name:'Compression',series:'6',reps:'10',note:"2 min de repos\n\nLes deux jambes en même temps.",video:'https://youtube.com/shorts/Vp06jUKMp0c'},
+      null,null,null
+    ]},
+    {id:'pr4',num:4,name:'Séance 4',mission:null,exercises:[null,null,null,null,null,null,null]},
+    {id:'pr5',num:5,name:'Séance 5',mission:null,exercises:[null,null,null,null,null,null,null]}
   ]}
 };
 const NS={hs:6,pr:4};
@@ -856,7 +874,8 @@ function buildHomeNext(){
         const xc=sess.exercises.filter(e=>e).length;
         const c=document.createElement('div');c.className='next-card';
         c.onclick=()=>{goTab('seances');openProg(pid);openSession(pid,sess.id);};
-        c.innerHTML=`<div class="next-ic">${prog.icon}</div><div class="next-body"><div class="next-name">${prog.name} · Séance ${sess.num}</div><div class="next-sub">${xc>0?xc+' exercice'+(xc>1?'s':''):'À venir'}</div></div><div class="next-arr">→</div>`;
+        const sLabel=sess.name&&sess.name!=='Séance '+sess.num?`Séance ${sess.num} · ${sess.name}`:`Séance ${sess.num}`;
+        c.innerHTML=`<div class="next-ic">${prog.icon}</div><div class="next-body"><div class="next-name">${prog.name} — ${sLabel}</div><div class="next-sub">${xc>0?xc+' exercice'+(xc>1?'s':''):'À venir'}</div></div><div class="next-arr">→</div>`;
         el.appendChild(c);return;
       }
     }
@@ -917,7 +936,9 @@ function openProg(pid){
     const done=ls('pp_sess_'+sess.id)==='1';
     const xc=sess.exercises.filter(e=>e).length;
     const r=document.createElement('div');r.className='sess-row'+(done?' done':'');r.onclick=()=>openSession(pid,sess.id);
-    r.innerHTML=`<div class="sess-n">${String(sess.num).padStart(2,'0')}</div><div class="sess-body"><div class="sess-name">Séance ${sess.num}</div><div class="sess-sub">${done?'Complétée':(xc>0?xc+' exercice'+(xc>1?'s':''):'À venir')}</div></div><div class="sess-check">${done?'✓':''}</div>`;
+    const rowName=sess.name&&sess.name!=='Séance '+sess.num?sess.name:`Séance ${sess.num}`;
+    const rowSub=sess.name&&sess.name!=='Séance '+sess.num?`Séance ${sess.num} · ${done?'Complétée':(xc>0?xc+' ex.':'À venir')}`:(done?'Complétée':(xc>0?xc+' exercice'+(xc>1?'s':''):'À venir'));
+    r.innerHTML=`<div class="sess-n">${String(sess.num).padStart(2,'0')}</div><div class="sess-body"><div class="sess-name">${rowName}</div><div class="sess-sub">${rowSub}</div></div><div class="sess-check">${done?'✓':''}</div>`;
     c.appendChild(r);
   });
   document.getElementById('sc-seances').scrollTop=0;
@@ -933,7 +954,8 @@ function closeProg(){
 function openSession(pid,sessId){
   const prog=SESSIONS[pid];const sess=prog.sessions.find(s=>s.id===sessId);if(!sess)return;
   curSess={pid,sessId};
-  tx('sess-title',prog.name+' · '+sess.num);
+  const sessLabel=sess.name&&sess.name!=='Séance '+sess.num?`Séance ${sess.num} · ${sess.name}`:prog.name+' · '+sess.num;
+  tx('sess-title',sessLabel);
   const mw=document.getElementById('miss-wrap');
   if(sess.mission){mw.style.display='block';tx('miss-txt',sess.mission);}else mw.style.display='none';
   refreshDone(sessId);
