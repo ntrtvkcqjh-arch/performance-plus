@@ -410,6 +410,15 @@ body.app-on #cv{opacity:0}
 .toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);left:50%;transform:translateX(-50%);background:#111;color:#FAF7F2;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;letter-spacing:.04em;z-index:999;white-space:nowrap;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.25)}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── HORLOGE ── */
+.hero-clock{display:flex;align-items:baseline;gap:10px;margin-bottom:18px}
+.clock-time{font-size:clamp(52px,16vw,72px);font-weight:100;letter-spacing:-.03em;line-height:1;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;font-variant-numeric:tabular-nums;color:var(--t)}
+.clock-colon{color:var(--g2);font-weight:200;animation:colonBlink 1s step-start infinite}
+@keyframes colonBlink{0%,100%{opacity:1}50%{opacity:.2}}
+.clock-right{display:flex;flex-direction:column;gap:4px;padding-bottom:6px}
+.clock-secs{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--g);font-variant-numeric:tabular-nums;min-width:24px}
+.clock-date{font-size:11px;color:var(--t2);letter-spacing:.04em;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -442,6 +451,13 @@ body.app-on #cv{opacity:0}
       <div class="nb"><div class="nb-mark">P+</div><div class="nb-sp"></div></div>
       <div class="sc">
         <div class="hero">
+          <div class="hero-clock">
+            <div class="clock-time"><span id="ck-h">00</span><span class="clock-colon">:</span><span id="ck-m">00</span></div>
+            <div class="clock-right">
+              <div class="clock-secs" id="ck-s">00</div>
+              <div class="clock-date" id="ck-d">—</div>
+            </div>
+          </div>
           <div class="hero-greet" id="h-greet">Bonjour Marjana ☀️</div>
           <div class="hero-tagline" id="h-tagline">Prête à attaquer la journée ? 💪</div>
           <div class="hero-profile">
@@ -764,7 +780,28 @@ function buildGreeting(){
 }
 
 function buildAll(){
-  buildGreeting();buildRoadmap();buildHomeRM();buildHomeNext();updateStats();buildProgGrid();buildCoach();
+  buildGreeting();buildRoadmap();buildHomeRM();buildHomeNext();updateStats();buildProgGrid();buildCoach();startClock();
+}
+
+/* ── HORLOGE TEMPS RÉEL ── */
+const JOURS=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+const MOIS=['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc'];
+let _clockIv=null;
+function startClock(){
+  if(_clockIv)return;
+  function tick(){
+    const n=new Date();
+    const h=String(n.getHours()).padStart(2,'0');
+    const m=String(n.getMinutes()).padStart(2,'0');
+    const s=String(n.getSeconds()).padStart(2,'0');
+    const d=`${JOURS[n.getDay()]} ${n.getDate()} ${MOIS[n.getMonth()]}`;
+    const eh=document.getElementById('ck-h');if(eh)eh.textContent=h;
+    const em=document.getElementById('ck-m');if(em)em.textContent=m;
+    const es=document.getElementById('ck-s');if(es)es.textContent=s;
+    const ed=document.getElementById('ck-d');if(ed)ed.textContent=d;
+  }
+  tick();
+  _clockIv=setInterval(tick,1000);
 }
 
 /* ── COACH ── */
