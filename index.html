@@ -429,6 +429,14 @@ body.app-on #cv{opacity:0}
 /* ── MODIFY BUTTON (navbar) ── */
 .nb-edit{background:none;border:1px solid var(--b);border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g);cursor:pointer;font-family:inherit;transition:all .2s}
 .nb-edit:active{background:var(--g-dim)}
+/* ── rôles : coach-only caché par défaut, visible en mode coach ── */
+.coach-only{display:none!important}
+body.coach-mode .coach-only{display:unset!important}
+body.coach-mode .coach-only-flex{display:flex!important}
+/* badge rôle dans le header */
+.role-badge{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:20px;margin-left:8px}
+.role-badge.marjana{background:rgba(233,185,73,.18);color:#9A7209}
+.role-badge.julian{background:rgba(74,144,226,.15);color:#2260A8}
 /* ── ADD BLOCK BUTTON ── */
 .add-block-btn{display:block;width:100%;background:none;border:1px dashed rgba(17,17,17,.15);border-radius:14px;padding:16px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(17,17,17,.4);cursor:pointer;font-family:inherit;margin-top:4px;transition:all .2s}
 .add-block-btn:active{background:rgba(17,17,17,.04)}
@@ -526,7 +534,7 @@ body.app-on #cv{opacity:0}
 
 <!-- AUTH (iPhone lock) -->
 <div id="auth">
-  <div class="lock-name">Marjana</div>
+  <div class="lock-name" id="lock-name">Performance+</div>
   <div class="lock-card">
     <input id="pwd" class="lock-inp" type="password" placeholder="mot de passe" autocomplete="current-password"/>
     <button class="lock-btn" onclick="login()">Déverrouiller →</button>
@@ -576,7 +584,7 @@ body.app-on #cv{opacity:0}
 
     <!-- ROADMAP -->
     <div class="screen" id="s-roadmap">
-      <div class="nb"><div class="nb-mark">P+</div><div class="nb-title" id="rm-title">Roadmap</div><button class="nb-edit" onclick="openEditRoadmap()">Modifier</button></div>
+      <div class="nb"><div class="nb-mark">P+</div><div class="nb-title" id="rm-title">Roadmap</div><button class="nb-edit coach-only" onclick="openEditRoadmap()">Modifier</button></div>
       <div class="sc"><div id="phases"></div></div>
       <!-- Edit overlay objectifs -->
       <div class="edit-overlay" id="rm-edit-overlay">
@@ -605,7 +613,7 @@ body.app-on #cv{opacity:0}
 
     <!-- COACH -->
     <div class="screen" id="s-coach">
-      <div class="nb"><div class="nb-mark">P+</div><div class="nb-title">Coach</div><button class="nb-edit" onclick="openEditCoach()">Modifier</button></div>
+      <div class="nb"><div class="nb-mark">P+</div><div class="nb-title">Coach</div><button class="nb-edit coach-only" onclick="openEditCoach()">Modifier</button></div>
       <div class="sc"><div id="coach-cont"></div></div>
       <!-- Edit overlay coach -->
       <div class="edit-overlay" id="coach-edit-overlay">
@@ -623,7 +631,7 @@ body.app-on #cv{opacity:0}
       <div class="nb">
         <button class="nb-back" onclick="closeSession()">← Séances</button>
         <div class="nb-title" id="sess-title"></div>
-        <button class="nb-edit" onclick="openEditSession()">Modifier</button>
+        <button class="nb-edit coach-only" onclick="openEditSession()">Modifier</button>
       </div>
       <div id="miss-wrap" class="miss-banner" style="display:none">
         <div class="miss-ey">Mission de la semaine</div>
@@ -739,7 +747,10 @@ body.app-on #cv{opacity:0}
 })();
 
 /* DATA */
-const PWD='perf2026';
+const PWD_M='perf2026';
+const PWD_J='julian2026';
+let _role=null;
+const isCoach=()=>_role==='julian';
 const PHASES=[
   {id:'p1',num:'01',name:'Fondations',color:'#D4AF6E',objectifs:[
     'Prendre en force dans les épaules / Obj : 45 secondes 3 fois au mur',
@@ -835,17 +846,21 @@ document.getElementById('splash').addEventListener('click',showAuth);
 document.getElementById('pwd').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
 function login(){
   const inp=document.getElementById('pwd');
-  if(inp.value===PWD){
+  const val=inp.value;
+  if(val===PWD_M||val===PWD_J){
+    _role=val===PWD_J?'julian':'marjana';
+    // Appliquer le mode coach si Julian
+    if(isCoach())document.body.classList.add('coach-mode');
+    // Mettre à jour l'accueil selon le rôle
+    _applyRoleUI();
     const auth=document.getElementById('auth');
     auth.classList.add('off');
     buildAll();
     setTimeout(()=>{
       auth.style.display='none';
-      // Activer le thème clair + cacher canvas/glow
       document.body.classList.add('app-on');
       requestAnimationFrame(()=>requestAnimationFrame(()=>{
         document.getElementById('app').classList.add('on');
-        // Bloom cinématographique : flash blanc qui se dissout
         const bloom=document.createElement('div');
         bloom.style.cssText='position:fixed;inset:0;z-index:50;background:#fff;opacity:.35;pointer-events:none;transition:opacity .7s ease';
         document.body.appendChild(bloom);
@@ -859,6 +874,28 @@ function login(){
     inp.classList.add('shake');
     inp.value='';
     setTimeout(()=>{inp.classList.remove('shake');e.textContent='';},2500);
+  }
+}
+function _applyRoleUI(){
+  if(isCoach()){
+    // Accueil Julian
+    const greet=document.getElementById('h-greet');
+    if(greet)greet.textContent='Bonjour Julian 👋';
+    const tagline=document.getElementById('h-tagline');
+    if(tagline)tagline.textContent='Tableau de bord coach · Performance+';
+    const av=document.querySelector('.hero-av');
+    if(av){av.textContent='J';av.style.background='rgba(74,144,226,.18)';av.style.color='#2260A8';}
+    const pname=document.querySelector('.hero-pname');
+    if(pname)pname.textContent='Julian — Coach';
+  }
+  // Badge rôle dans le hero
+  const psub=document.querySelector('.hero-psub');
+  if(psub&&!document.getElementById('role-badge')){
+    const badge=document.createElement('span');
+    badge.id='role-badge';
+    badge.className='role-badge '+(isCoach()?'julian':'marjana');
+    badge.textContent=isCoach()?'Coach':'Cliente';
+    psub.after(badge);
   }
 }
 
@@ -1327,17 +1364,17 @@ function renderComms(sid){
     ${_repliesHtml(c.replies||[])}
     <div class="comm-meta">
       <button class="comm-like${c.liked?' on':''}" onclick="likeComm('${sid}',${i})">${c.liked?'♥':'♡'} ${c.likes||0}</button>
-      <button class="comm-reply-btn" onclick="toggleCommReply('${sid}',${i})">Répondre</button>
+      ${isCoach()?`<button class="comm-reply-btn" onclick="toggleCommReply('${sid}',${i})">Répondre</button>`:''}
       <button class="comm-vid-btn" onclick="openCommAttach('${sid}',${i})">📎 Vidéo</button>
       <button class="comm-del-btn" onclick="delComm('${sid}',${i})">×</button>
     </div>
-    <div class="comm-reply-form" id="crf-${sid}-${i}" style="display:none">
-      <textarea class="comm-reply-inp" id="cri-${sid}-${i}" placeholder="Ta réponse..." rows="2"></textarea>
+    ${isCoach()?`<div class="comm-reply-form" id="crf-${sid}-${i}" style="display:none">
+      <textarea class="comm-reply-inp" id="cri-${sid}-${i}" placeholder="Ta réponse en tant que Julian - Coach..." rows="2"></textarea>
       <div class="comm-reply-actions">
         <button class="comm-reply-cancel" onclick="toggleCommReply('${sid}',${i})">Annuler</button>
         <button class="comm-reply-send" onclick="submitCommReply('${sid}',${i})">Envoyer →</button>
       </div>
-    </div>
+    </div>`:''}
   </div>
 </div>`).join('');
 }
@@ -1545,16 +1582,16 @@ function renderExComms(sid,i){
   ${_repliesHtml(c.replies||[])}
   <div class="ex-comm-actions">
     <button class="ex-comm-like${c.liked?' on':''}" onclick="likeExComm('${sid}',${i},${ci})">${c.liked?'♥':'♡'} ${c.likes||0}</button>
-    <button class="ex-comm-reply-btn" onclick="toggleExReply('${sid}',${i},${ci})">Répondre</button>
+    ${isCoach()?`<button class="ex-comm-reply-btn" onclick="toggleExReply('${sid}',${i},${ci})">Répondre</button>`:''}
     <button class="ex-comm-vid-btn" onclick="openExCommAttach('${sid}',${i},${ci})">📎 Vidéo</button>
   </div>
-  <div class="ex-comm-reply-form" id="erf-${sid}-${i}-${ci}" style="display:none">
-    <textarea class="ex-comm-reply-inp" id="eri-${sid}-${i}-${ci}" placeholder="Ta réponse..." rows="2"></textarea>
+  ${isCoach()?`<div class="ex-comm-reply-form" id="erf-${sid}-${i}-${ci}" style="display:none">
+    <textarea class="ex-comm-reply-inp" id="eri-${sid}-${i}-${ci}" placeholder="Ta réponse en tant que Julian - Coach..." rows="2"></textarea>
     <div class="ex-comm-reply-actions">
       <button class="ex-comm-reply-cancel" onclick="toggleExReply('${sid}',${i},${ci})">Annuler</button>
       <button class="ex-comm-reply-send" onclick="submitExReply('${sid}',${i},${ci})">Envoyer →</button>
     </div>
-  </div>
+  </div>`:''}
 </div>`).join('');
 }
 function autoResEx(el){
