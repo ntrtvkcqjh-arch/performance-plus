@@ -435,7 +435,7 @@ body.app-on #cv{opacity:0}
 .attach-info{flex:1;min-width:0}
 .attach-name{font-size:13px;font-weight:600;color:var(--t);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .attach-meta{font-size:11px;color:var(--t2)}
-.attach-open{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g);text-decoration:none;flex-shrink:0;padding:6px 10px;background:var(--g-dim);border-radius:8px;border:1px solid var(--bg);transition:all .18s}
+.attach-open{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g);text-decoration:none;flex-shrink:0;padding:6px 10px;background:var(--g-dim);border-radius:8px;border:1px solid var(--bg);transition:all .18s;cursor:pointer;font-family:inherit}
 .attach-open:active{opacity:.7}
 .attach-del{background:none;border:none;cursor:pointer;font-size:18px;color:var(--t3);padding:4px 4px 4px 8px;flex-shrink:0;line-height:1;transition:color .18s}
 .attach-del:active{color:#E05050}
@@ -454,6 +454,19 @@ body.app-on #cv{opacity:0}
 .attach-save{flex:1;background:#E9B949;border:none;border-radius:13px;padding:15px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#5A3A00;cursor:pointer;font-family:inherit;transition:all .18s}
 .attach-save:active{opacity:.8;transform:scale(.98)}
 .attach-cancel-btn{background:rgba(17,17,17,.07);border:none;border-radius:13px;padding:15px 20px;font-size:12px;font-weight:700;color:rgba(17,17,17,.45);cursor:pointer;font-family:inherit;transition:all .18s}
+.atch-tabs{display:flex;gap:8px;margin-bottom:16px}
+.atch-tab{flex:1;background:rgba(17,17,17,.06);border:none;border-radius:12px;padding:12px 8px;font-size:12px;font-weight:700;color:rgba(17,17,17,.4);cursor:pointer;font-family:inherit;transition:all .2s}
+.atch-tab.on{background:#E9B949;color:#5A3A00}
+.atch-file-label{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#fff;border:1.5px dashed rgba(17,17,17,.15);border-radius:14px;padding:22px 16px;cursor:pointer;margin-bottom:12px;transition:all .2s;text-align:center}
+.atch-file-label:active{background:rgba(17,17,17,.03)}
+.atch-file-ic{font-size:28px}
+.atch-file-txt{font-size:13px;font-weight:600;color:rgba(17,17,17,.5);line-height:1.4}
+.atch-file-txt.picked{color:#2DB55D}
+/* Lecteur vidéo overlay */
+.vid-player-ov{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.96);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:20px}
+.vid-player-ov video{max-width:100%;max-height:72vh;border-radius:14px;background:#000}
+.vid-close{background:#FAF7F2;border:none;border-radius:12px;padding:13px 32px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:opacity .18s}
+.vid-close:active{opacity:.75}
 
 /* ── TOAST ── */
 .toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);left:50%;transform:translateX(-50%);background:#111;color:#FAF7F2;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;letter-spacing:.04em;z-index:999;white-space:nowrap;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.25)}
@@ -635,13 +648,33 @@ body.app-on #cv{opacity:0}
   <div class="attach-modal" id="attach-modal" onclick="if(event.target===this)closeAttachModal()">
     <div class="attach-sheet">
       <div class="attach-sheet-ttl">📎 Ajouter une vidéo</div>
+      <div class="atch-tabs">
+        <button class="atch-tab on" id="atch-tab-phone" onclick="switchAttachTab('phone')">📱 Mon téléphone</button>
+        <button class="atch-tab" id="atch-tab-link" onclick="switchAttachTab('link')">🔗 Lien vidéo</button>
+      </div>
       <input class="attach-inp" id="atch-inp-label" placeholder="Titre (ex: Séance du 23 mai)"/>
-      <input class="attach-inp" id="atch-inp-url" type="url" placeholder="Lien vidéo (YouTube, Drive...)"/>
+      <!-- Tab: phone -->
+      <div id="atch-pane-phone">
+        <label class="atch-file-label" for="atch-file-input">
+          <span class="atch-file-ic">📂</span>
+          <span class="atch-file-txt" id="atch-file-txt">Appuie pour choisir une vidéo</span>
+        </label>
+        <input type="file" id="atch-file-input" accept="video/*" style="display:none" onchange="onAttachFileSelect(this)"/>
+      </div>
+      <!-- Tab: link -->
+      <div id="atch-pane-link" style="display:none">
+        <input class="attach-inp" id="atch-inp-url" type="url" placeholder="Lien vidéo (YouTube, Drive...)"/>
+      </div>
       <div class="attach-actions">
         <button class="attach-save" onclick="saveAttachEntry()">Ajouter →</button>
         <button class="attach-cancel-btn" onclick="closeAttachModal()">Annuler</button>
       </div>
     </div>
+  </div>
+  <!-- Local video player overlay -->
+  <div class="vid-player-ov" id="vid-player-ov" style="display:none" onclick="if(event.target===this)closeLocalVideo()">
+    <video id="vid-player-el" controls playsinline></video>
+    <button class="vid-close" onclick="closeLocalVideo()">Fermer ✕</button>
   </div>
 
   <!-- TABBAR -->
@@ -1458,6 +1491,48 @@ function delExComm(sid,i,ci){
 ══════════════════════════════════════════════ */
 function getAttach(sid){return JSON.parse(ls('pp_attach_'+sid)||'[]');}
 function saveAttach(sid,arr){ss('pp_attach_'+sid,JSON.stringify(arr));}
+/* ── IndexedDB for video blobs ── */
+const _DB_NAME='pp_videos';let _db=null;
+function openDB(){return new Promise((res,rej)=>{if(_db){res(_db);return;}const r=indexedDB.open(_DB_NAME,1);r.onupgradeneeded=e=>e.target.result.createObjectStore('videos',{keyPath:'id'});r.onsuccess=e=>{_db=e.target.result;res(_db);};r.onerror=()=>rej(r.error);});}
+function saveVideoBlob(id,blob){return openDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction('videos','readwrite');tx.objectStore('videos').put({id,blob});tx.oncomplete=res;tx.onerror=()=>rej(tx.error);}));}
+function getVideoBlob(id){return openDB().then(db=>new Promise((res,rej)=>{const r=db.transaction('videos','readonly').objectStore('videos').get(id);r.onsuccess=()=>res(r.result?.blob||null);r.onerror=()=>rej(r.error);}));}
+function deleteVideoBlob(id){return openDB().then(db=>new Promise(res=>{const tx=db.transaction('videos','readwrite');tx.objectStore('videos').delete(id);tx.oncomplete=res;}));}
+
+/* ── Attach modal tabs & file picker ── */
+let _attachTab='phone',_attachFile=null;
+function switchAttachTab(tab){
+  _attachTab=tab;_attachFile=null;
+  document.getElementById('atch-tab-phone').classList.toggle('on',tab==='phone');
+  document.getElementById('atch-tab-link').classList.toggle('on',tab==='link');
+  document.getElementById('atch-pane-phone').style.display=tab==='phone'?'':'none';
+  document.getElementById('atch-pane-link').style.display=tab==='link'?'':'none';
+  if(tab==='phone'){const ft=document.getElementById('atch-file-txt');if(ft){ft.textContent='Appuie pour choisir une vidéo';ft.className='atch-file-txt';}}
+}
+function onAttachFileSelect(input){
+  const file=input.files?.[0];
+  if(!file)return;
+  _attachFile=file;
+  const ft=document.getElementById('atch-file-txt');
+  if(ft){ft.textContent='✔ '+file.name;ft.className='atch-file-txt picked';}
+}
+function playLocalVideo(vidId){
+  getVideoBlob(vidId).then(blob=>{
+    if(!blob){showToast('Vidéo introuvable sur cet appareil');return;}
+    const url=URL.createObjectURL(blob);
+    const ov=document.getElementById('vid-player-ov');
+    const el=document.getElementById('vid-player-el');
+    el.src=url;ov.style.display='flex';el.play().catch(()=>{});
+    ov._blobUrl=url;
+  }).catch(()=>showToast('Erreur lecture vidéo'));
+}
+function closeLocalVideo(){
+  const ov=document.getElementById('vid-player-ov');
+  const el=document.getElementById('vid-player-el');
+  el.pause();el.src='';
+  if(ov._blobUrl){URL.revokeObjectURL(ov._blobUrl);ov._blobUrl=null;}
+  ov.style.display='none';
+}
+
 function renderAttach(sid){
   const list=document.getElementById('atch-list-'+sid);
   if(!list)return;
@@ -1470,7 +1545,9 @@ function renderAttach(sid){
     <div class="attach-name">${esc(a.label||'Vidéo')}</div>
     <div class="attach-meta">${a.date||''}</div>
   </div>
-  <a class="attach-open" href="${esc(a.url)}" target="_blank">Voir →</a>
+  ${a.type==='local'
+    ? `<button class="attach-open" onclick="playLocalVideo('${a.id}')">▶ Voir</button>`
+    : `<a class="attach-open" href="${esc(a.url)}" target="_blank">Voir →</a>`}
   <button class="attach-del" onclick="delAttach('${sid}',${i})">×</button>
 </div>`).join('');
 }
@@ -1479,30 +1556,49 @@ function openAttachModal(sid){
   _attachSid=sid;
   const m=document.getElementById('attach-modal');if(!m)return;
   document.getElementById('atch-inp-label').value='';
-  document.getElementById('atch-inp-url').value='';
+  const urlInp=document.getElementById('atch-inp-url');if(urlInp)urlInp.value='';
+  _attachFile=null;
+  switchAttachTab('phone');
   m.classList.add('on');
   setTimeout(()=>document.getElementById('atch-inp-label').focus(),350);
 }
 function closeAttachModal(){
   document.getElementById('attach-modal')?.classList.remove('on');
-  _attachSid=null;
+  _attachSid=null;_attachFile=null;
 }
 function saveAttachEntry(){
   if(!_attachSid)return;
   const label=(document.getElementById('atch-inp-label')?.value||'').trim();
-  const url=(document.getElementById('atch-inp-url')?.value||'').trim();
-  if(!url){showToast('Ajoute un lien vidéo 🎥');return;}
-  const items=getAttach(_attachSid);
   const n=new Date();
   const d=n.getDate()+'/'+(n.getMonth()+1)+'/'+n.getFullYear();
-  items.push({id:Date.now(),label:label||'Vidéo du '+d,url,date:d});
-  saveAttach(_attachSid,items);
-  renderAttach(_attachSid);
-  closeAttachModal();
-  showToast('Vidéo ajoutée ✓');
+  if(_attachTab==='phone'){
+    if(!_attachFile){showToast('Choisis une vidéo 📱');return;}
+    const id='vid_'+Date.now();
+    showToast('Enregistrement…');
+    saveVideoBlob(id,_attachFile).then(()=>{
+      const items=getAttach(_attachSid);
+      items.push({id,type:'local',label:label||_attachFile.name||'Vidéo du '+d,date:d});
+      saveAttach(_attachSid,items);
+      renderAttach(_attachSid);
+      closeAttachModal();
+      showToast('Vidéo enregistrée ✓');
+    }).catch(()=>showToast('Erreur enregistrement'));
+  } else {
+    const url=(document.getElementById('atch-inp-url')?.value||'').trim();
+    if(!url){showToast('Ajoute un lien vidéo 🎥');return;}
+    const items=getAttach(_attachSid);
+    items.push({id:'url_'+Date.now(),type:'url',label:label||'Vidéo du '+d,url,date:d});
+    saveAttach(_attachSid,items);
+    renderAttach(_attachSid);
+    closeAttachModal();
+    showToast('Vidéo ajoutée ✓');
+  }
 }
 function delAttach(sid,idx){
-  const items=getAttach(sid);items.splice(idx,1);
+  const items=getAttach(sid);
+  const a=items[idx];
+  if(a?.type==='local')deleteVideoBlob(a.id).catch(()=>{});
+  items.splice(idx,1);
   saveAttach(sid,items);renderAttach(sid);
 }
 
