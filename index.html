@@ -2303,16 +2303,16 @@ async function sendMsg(){
   const inp=document.getElementById('chat-inp');
   const txt=(inp?.value||'').trim();if(!txt)return;
   const btn=document.getElementById('chat-send');
-  /* Vider l'input immédiatement (UX optimiste) */
-  inp.value='';inp.style.height='42px';
+  inp.value='';inp.style.height='36px';
   if(btn)btn.disabled=true;
   try{
     const{error}=await _supa().from('pp_messages').insert({content:txt,author:_role});
     if(error)throw error;
-    /* Le Realtime va déclencher renderMsgs automatiquement */
+    /* Rafraîchir immédiatement après insert (sans attendre Realtime) */
+    await renderMsgs();
   }catch(e){
     showToast('Erreur envoi · Vérifie ta connexion 📡');
-    inp.value=txt;/* Restore */
+    inp.value=txt;
     if(btn)btn.disabled=false;
   }
 }
