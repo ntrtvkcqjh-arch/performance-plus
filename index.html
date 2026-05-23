@@ -331,6 +331,36 @@ body.app-on #cv{opacity:0}
 .comm-reply-box{margin-top:10px;background:var(--s2);border-radius:10px;padding:10px 13px;font-size:13px;color:var(--t2);line-height:1.55;border-left:2px solid var(--g2)}
 .comm-empty{text-align:center;font-size:12px;color:var(--t3);padding:24px 0;letter-spacing:.04em}
 .comm-section-lbl{font-size:9px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);padding-top:20px;margin-bottom:0}
+/* ── comment enhancements: reply, video, like ── */
+.comm-vid-btn{background:none;border:none;cursor:pointer;font-size:11px;font-weight:600;color:var(--t2);padding:0;font-family:inherit;letter-spacing:.04em;transition:color .18s}
+.comm-vid-btn:hover{color:var(--g)}
+.comm-del-btn{background:none;border:none;cursor:pointer;font-size:17px;color:var(--t3);padding:0 0 0 6px;line-height:1;transition:color .18s;margin-left:auto;flex-shrink:0}
+.comm-del-btn:active{color:#E05050}
+.comm-reply-form{margin-top:10px;background:var(--s1);border:1px solid var(--b);border-radius:12px;padding:10px 13px}
+.comm-reply-inp{width:100%;background:transparent;border:none;outline:none;font-size:13px;color:var(--t);font-family:inherit;resize:none;line-height:1.5;min-height:34px}
+.comm-reply-inp::placeholder{color:var(--t3)}
+.comm-reply-actions{display:flex;gap:8px;margin-top:7px;justify-content:flex-end}
+.comm-reply-send{background:var(--g2);border:none;border-radius:9px;padding:6px 15px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5A3A00;cursor:pointer;font-family:inherit}
+.comm-reply-cancel{background:none;border:1px solid var(--b);border-radius:9px;padding:6px 13px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);cursor:pointer;font-family:inherit}
+.comm-replies{margin-top:9px;display:flex;flex-direction:column;gap:5px}
+.comm-reply-item{background:var(--s1);border-left:2.5px solid var(--g2);border-radius:0 9px 9px 0;padding:7px 12px;font-size:13px;color:var(--t);line-height:1.5}
+.comm-reply-who{font-size:10px;font-weight:700;color:var(--g);margin-bottom:2px;letter-spacing:.06em}
+.comm-vids{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.comm-vid-chip{display:inline-flex;align-items:center;gap:5px;background:var(--s1);border:1px solid var(--b);border-radius:9px;padding:4px 10px;font-size:11px;color:var(--t);cursor:pointer;text-decoration:none;transition:all .18s}
+.comm-vid-chip:active{opacity:.7}
+.comm-vid-chip-del{background:none;border:none;cursor:pointer;font-size:13px;color:var(--t3);padding:0 0 0 4px;line-height:1}
+/* ── exercise comment enhancements ── */
+.ex-comm-actions{display:flex;align-items:center;gap:10px;margin-top:7px;flex-wrap:wrap}
+.ex-comm-like{background:none;border:none;cursor:pointer;font-size:11px;color:var(--t3);padding:0;font-family:inherit;transition:color .18s;letter-spacing:.02em}
+.ex-comm-like.on{color:#E05050}
+.ex-comm-reply-btn,.ex-comm-vid-btn{background:none;border:none;cursor:pointer;font-size:11px;font-weight:600;color:var(--t3);padding:0;font-family:inherit;letter-spacing:.04em;transition:color .18s}
+.ex-comm-reply-btn:hover,.ex-comm-vid-btn:hover{color:var(--g)}
+.ex-comm-reply-form{margin-top:8px;background:#fff;border:1px solid var(--b);border-radius:10px;padding:9px 11px}
+.ex-comm-reply-inp{width:100%;background:transparent;border:none;outline:none;font-size:12px;color:var(--t);font-family:inherit;resize:none;line-height:1.5;min-height:30px}
+.ex-comm-reply-inp::placeholder{color:var(--t3)}
+.ex-comm-reply-actions{display:flex;gap:7px;margin-top:5px;justify-content:flex-end}
+.ex-comm-reply-send{background:var(--g2);border:none;border-radius:8px;padding:5px 13px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5A3A00;cursor:pointer;font-family:inherit}
+.ex-comm-reply-cancel{background:none;border:1px solid var(--b);border-radius:8px;padding:5px 11px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);cursor:pointer;font-family:inherit}
 
 /* ── AI BUTTON ── */
 .ai-btn-wrap{padding:20px 22px 28px}
@@ -1261,6 +1291,27 @@ function buildCommMain(pid,sess){
   setupNoteAutosave(sid);
 }
 
+function _commVidsHtml(videos,kind,sid,idx,exIdx){
+  if(!videos||!videos.length)return '';
+  return '<div class="comm-vids">'+videos.map((v,vi)=>{
+    const del=kind==='exc'
+      ?`onclick="delExCommVid('${sid}',${exIdx},${idx},${vi})"`
+      :`onclick="delCommVid('${sid}',${idx},${vi})"`;
+    const play=v.type==='local'
+      ?`<span onclick="playLocalVideo('${v.id}')" style="cursor:pointer">▶ ${esc(v.label)}</span>`
+      :`<a href="${esc(v.url)}" target="_blank" style="color:inherit;text-decoration:none">🔗 ${esc(v.label)}</a>`;
+    return `<div class="comm-vid-chip">${play}<button class="comm-vid-chip-del" ${del}>×</button></div>`;
+  }).join('')+'</div>';
+}
+function _repliesHtml(replies){
+  if(!replies||!replies.length)return '';
+  return '<div class="comm-replies">'+replies.map(r=>`
+<div class="comm-reply-item">
+  <div class="comm-reply-who">${r.author==='julian'?'Julian (Coach)':'Marjana'}</div>
+  ${esc(r.content)}
+</div>`).join('')+'</div>';
+}
+
 function renderComms(sid){
   const list=document.getElementById('clist-'+sid);
   if(!list)return;
@@ -1270,14 +1321,23 @@ function renderComms(sid){
 <div class="comm-item">
   <div class="comm-av">MH</div>
   <div class="comm-body">
-    <div class="comm-name">Marjana</div>
+    <div class="comm-name">Marjana <span class="comm-time" style="font-weight:400;margin-left:6px">${fmtTime(c.ts)}</span></div>
     <div class="comm-text">${esc(c.content)}</div>
+    ${_commVidsHtml(c.videos||[],'comm',sid,i,null)}
+    ${_repliesHtml(c.replies||[])}
     <div class="comm-meta">
-      <span class="comm-time">${fmtTime(c.ts)}</span>
       <button class="comm-like${c.liked?' on':''}" onclick="likeComm('${sid}',${i})">${c.liked?'♥':'♡'} ${c.likes||0}</button>
-      <button class="comm-reply-btn" onclick="replyComm('${sid}',${i})">Répondre</button>
+      <button class="comm-reply-btn" onclick="toggleCommReply('${sid}',${i})">Répondre</button>
+      <button class="comm-vid-btn" onclick="openCommAttach('${sid}',${i})">📎 Vidéo</button>
+      <button class="comm-del-btn" onclick="delComm('${sid}',${i})">×</button>
     </div>
-    ${c.reply?`<div class="comm-reply-box">↩ ${esc(c.reply)}</div>`:''}
+    <div class="comm-reply-form" id="crf-${sid}-${i}" style="display:none">
+      <textarea class="comm-reply-inp" id="cri-${sid}-${i}" placeholder="Ta réponse..." rows="2"></textarea>
+      <div class="comm-reply-actions">
+        <button class="comm-reply-cancel" onclick="toggleCommReply('${sid}',${i})">Annuler</button>
+        <button class="comm-reply-send" onclick="submitCommReply('${sid}',${i})">Envoyer →</button>
+      </div>
+    </div>
   </div>
 </div>`).join('');
 }
@@ -1310,13 +1370,32 @@ function likeComm(sid,idx){
   comms[idx].likes=(comms[idx].likes||0)+(comms[idx].liked?1:-1);
   saveComms(sid,comms);renderComms(sid);
 }
-
-function replyComm(sid,idx){
-  const r=prompt('Répondre à ce commentaire :');
-  if(!r)return;
+function delComm(sid,idx){
   const comms=getComms(sid);
-  if(!comms[idx])return;
-  comms[idx].reply=r;
+  // delete associated blobs
+  (comms[idx]?.videos||[]).filter(v=>v.type==='local').forEach(v=>deleteVideoBlob(v.id).catch(()=>{}));
+  comms.splice(idx,1);saveComms(sid,comms);renderComms(sid);
+}
+function toggleCommReply(sid,idx){
+  const form=document.getElementById('crf-'+sid+'-'+idx);
+  if(!form)return;
+  const open=form.style.display==='none'||!form.style.display;
+  form.style.display=open?'block':'none';
+  if(open)document.getElementById('cri-'+sid+'-'+idx)?.focus();
+}
+function submitCommReply(sid,idx){
+  const inp=document.getElementById('cri-'+sid+'-'+idx);
+  const txt=(inp?.value||'').trim();if(!txt)return;
+  const comms=getComms(sid);if(!comms[idx])return;
+  if(!comms[idx].replies)comms[idx].replies=[];
+  comms[idx].replies.push({id:Date.now(),content:txt,ts:Date.now(),author:'marjana'});
+  saveComms(sid,comms);renderComms(sid);showToast('Réponse ajoutée ✓');
+}
+function delCommVid(sid,commIdx,vidIdx){
+  const comms=getComms(sid);if(!comms[commIdx])return;
+  const vids=comms[commIdx].videos||[];
+  if(vids[vidIdx]?.type==='local')deleteVideoBlob(vids[vidIdx].id).catch(()=>{});
+  vids.splice(vidIdx,1);comms[commIdx].videos=vids;
   saveComms(sid,comms);renderComms(sid);
 }
 
@@ -1458,10 +1537,24 @@ function renderExComms(sid,i){
   list.innerHTML=comms.map((c,ci)=>`
 <div class="ex-comm-item">
   <div class="ex-comm-hd">
-    <span class="ex-comm-who">MH</span>
-    <span style="display:flex;align-items:center;gap:6px"><span class="ex-comm-when">${fmtTime(c.ts)}</span><button class="ex-comm-del" onclick="delExComm('${sid}',${i},${ci})">×</button></span>
+    <span class="ex-comm-who">MH <span style="font-weight:400;color:var(--t3);font-size:10px;margin-left:4px">${fmtTime(c.ts)}</span></span>
+    <button class="ex-comm-del" onclick="delExComm('${sid}',${i},${ci})">×</button>
   </div>
   <div class="ex-comm-txt">${esc(c.content)}</div>
+  ${_commVidsHtml(c.videos||[],'exc',sid,ci,i)}
+  ${_repliesHtml(c.replies||[])}
+  <div class="ex-comm-actions">
+    <button class="ex-comm-like${c.liked?' on':''}" onclick="likeExComm('${sid}',${i},${ci})">${c.liked?'♥':'♡'} ${c.likes||0}</button>
+    <button class="ex-comm-reply-btn" onclick="toggleExReply('${sid}',${i},${ci})">Répondre</button>
+    <button class="ex-comm-vid-btn" onclick="openExCommAttach('${sid}',${i},${ci})">📎 Vidéo</button>
+  </div>
+  <div class="ex-comm-reply-form" id="erf-${sid}-${i}-${ci}" style="display:none">
+    <textarea class="ex-comm-reply-inp" id="eri-${sid}-${i}-${ci}" placeholder="Ta réponse..." rows="2"></textarea>
+    <div class="ex-comm-reply-actions">
+      <button class="ex-comm-reply-cancel" onclick="toggleExReply('${sid}',${i},${ci})">Annuler</button>
+      <button class="ex-comm-reply-send" onclick="submitExReply('${sid}',${i},${ci})">Envoyer →</button>
+    </div>
+  </div>
 </div>`).join('');
 }
 function autoResEx(el){
@@ -1482,8 +1575,36 @@ function pubExComm(sid,i){
   showToast('Commentaire ajouté ✓');
 }
 function delExComm(sid,i,ci){
-  const comms=getExComms(sid,i);comms.splice(ci,1);
-  saveExComms(sid,i,comms);renderExComms(sid,i);
+  const comms=getExComms(sid,i);
+  (comms[ci]?.videos||[]).filter(v=>v.type==='local').forEach(v=>deleteVideoBlob(v.id).catch(()=>{}));
+  comms.splice(ci,1);saveExComms(sid,i,comms);renderExComms(sid,i);
+}
+function likeExComm(sid,exIdx,ci){
+  const comms=getExComms(sid,exIdx);if(!comms[ci])return;
+  comms[ci].liked=!comms[ci].liked;
+  comms[ci].likes=(comms[ci].likes||0)+(comms[ci].liked?1:-1);
+  saveExComms(sid,exIdx,comms);renderExComms(sid,exIdx);
+}
+function toggleExReply(sid,exIdx,ci){
+  const form=document.getElementById('erf-'+sid+'-'+exIdx+'-'+ci);if(!form)return;
+  const open=form.style.display==='none'||!form.style.display;
+  form.style.display=open?'block':'none';
+  if(open)document.getElementById('eri-'+sid+'-'+exIdx+'-'+ci)?.focus();
+}
+function submitExReply(sid,exIdx,ci){
+  const inp=document.getElementById('eri-'+sid+'-'+exIdx+'-'+ci);
+  const txt=(inp?.value||'').trim();if(!txt)return;
+  const comms=getExComms(sid,exIdx);if(!comms[ci])return;
+  if(!comms[ci].replies)comms[ci].replies=[];
+  comms[ci].replies.push({id:Date.now(),content:txt,ts:Date.now(),author:'marjana'});
+  saveExComms(sid,exIdx,comms);renderExComms(sid,exIdx);showToast('Réponse ajoutée ✓');
+}
+function delExCommVid(sid,exIdx,ci,vi){
+  const comms=getExComms(sid,exIdx);if(!comms[ci])return;
+  const vids=comms[ci].videos||[];
+  if(vids[vi]?.type==='local')deleteVideoBlob(vids[vi].id).catch(()=>{});
+  vids.splice(vi,1);comms[ci].videos=vids;
+  saveExComms(sid,exIdx,comms);renderExComms(sid,exIdx);
 }
 
 /* ══════════════════════════════════════════════
@@ -1551,55 +1672,59 @@ function renderAttach(sid){
   <button class="attach-del" onclick="delAttach('${sid}',${i})">×</button>
 </div>`).join('');
 }
-let _attachSid=null;
-function openAttachModal(sid){
-  _attachSid=sid;
+// _attachCtx: {type:'session',sid} | {type:'comm',sid,ci} | {type:'excomm',sid,exIdx,ci}
+let _attachCtx=null;
+function _openAttachSheet(){
   const m=document.getElementById('attach-modal');if(!m)return;
   document.getElementById('atch-inp-label').value='';
   const urlInp=document.getElementById('atch-inp-url');if(urlInp)urlInp.value='';
-  _attachFile=null;
-  switchAttachTab('phone');
+  _attachFile=null;switchAttachTab('phone');
   m.classList.add('on');
   setTimeout(()=>document.getElementById('atch-inp-label').focus(),350);
 }
+function openAttachModal(sid){_attachCtx={type:'session',sid};_openAttachSheet();}
+function openCommAttach(sid,ci){_attachCtx={type:'comm',sid,ci};_openAttachSheet();}
+function openExCommAttach(sid,exIdx,ci){_attachCtx={type:'excomm',sid,exIdx,ci};_openAttachSheet();}
 function closeAttachModal(){
   document.getElementById('attach-modal')?.classList.remove('on');
-  _attachSid=null;_attachFile=null;
+  _attachCtx=null;_attachFile=null;
+}
+function _pushVideoToCtx(ctx,entry){
+  if(ctx.type==='session'){
+    const items=getAttach(ctx.sid);items.push(entry);saveAttach(ctx.sid,items);renderAttach(ctx.sid);
+  } else if(ctx.type==='comm'){
+    const comms=getComms(ctx.sid);if(!comms[ctx.ci])return;
+    if(!comms[ctx.ci].videos)comms[ctx.ci].videos=[];
+    comms[ctx.ci].videos.push(entry);saveComms(ctx.sid,comms);renderComms(ctx.sid);
+  } else if(ctx.type==='excomm'){
+    const comms=getExComms(ctx.sid,ctx.exIdx);if(!comms[ctx.ci])return;
+    if(!comms[ctx.ci].videos)comms[ctx.ci].videos=[];
+    comms[ctx.ci].videos.push(entry);saveExComms(ctx.sid,ctx.exIdx,comms);renderExComms(ctx.sid,ctx.exIdx);
+  }
 }
 function saveAttachEntry(){
-  if(!_attachSid)return;
+  if(!_attachCtx)return;
+  const ctx=_attachCtx;
   const label=(document.getElementById('atch-inp-label')?.value||'').trim();
-  const n=new Date();
-  const d=n.getDate()+'/'+(n.getMonth()+1)+'/'+n.getFullYear();
+  const n=new Date();const d=n.getDate()+'/'+(n.getMonth()+1)+'/'+n.getFullYear();
   if(_attachTab==='phone'){
     if(!_attachFile){showToast('Choisis une vidéo 📱');return;}
-    const id='vid_'+Date.now();
-    showToast('Enregistrement…');
+    const id='vid_'+Date.now();showToast('Enregistrement…');
     saveVideoBlob(id,_attachFile).then(()=>{
-      const items=getAttach(_attachSid);
-      items.push({id,type:'local',label:label||_attachFile.name||'Vidéo du '+d,date:d});
-      saveAttach(_attachSid,items);
-      renderAttach(_attachSid);
-      closeAttachModal();
-      showToast('Vidéo enregistrée ✓');
+      _pushVideoToCtx(ctx,{id,type:'local',label:label||_attachFile.name||'Vidéo du '+d,date:d});
+      closeAttachModal();showToast('Vidéo enregistrée ✓');
     }).catch(()=>showToast('Erreur enregistrement'));
   } else {
     const url=(document.getElementById('atch-inp-url')?.value||'').trim();
     if(!url){showToast('Ajoute un lien vidéo 🎥');return;}
-    const items=getAttach(_attachSid);
-    items.push({id:'url_'+Date.now(),type:'url',label:label||'Vidéo du '+d,url,date:d});
-    saveAttach(_attachSid,items);
-    renderAttach(_attachSid);
-    closeAttachModal();
-    showToast('Vidéo ajoutée ✓');
+    _pushVideoToCtx(ctx,{id:'url_'+Date.now(),type:'url',label:label||'Vidéo du '+d,url,date:d});
+    closeAttachModal();showToast('Vidéo ajoutée ✓');
   }
 }
 function delAttach(sid,idx){
-  const items=getAttach(sid);
-  const a=items[idx];
+  const items=getAttach(sid);const a=items[idx];
   if(a?.type==='local')deleteVideoBlob(a.id).catch(()=>{});
-  items.splice(idx,1);
-  saveAttach(sid,items);renderAttach(sid);
+  items.splice(idx,1);saveAttach(sid,items);renderAttach(sid);
 }
 
 /* ══════════════════════════════════════════════
