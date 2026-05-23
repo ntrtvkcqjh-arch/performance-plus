@@ -316,7 +316,6 @@ body.app-on #cv{opacity:0}
 .comm-input::placeholder{color:var(--t3);font-size:13px}
 .comm-send{display:none;margin-top:8px;background:var(--g2);border:none;border-radius:11px;padding:9px 18px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#5A3A00;cursor:pointer;font-family:inherit;transition:opacity .15s,transform .15s;float:right}
 .comm-send:active{opacity:.75;transform:scale(.97)}
-.comm-right:focus-within .comm-send{display:block}
 .comm-list{display:flex;flex-direction:column;gap:0}
 .comm-item{display:flex;gap:11px;padding:14px 0;border-bottom:1px solid var(--b);animation:fadeUp .28s ease both}
 .comm-item:last-child{border-bottom:none}
@@ -370,6 +369,15 @@ body.app-on #cv{opacity:0}
 .ai-accept:active{opacity:.8;transform:scale(.98)}
 .ai-reject{background:rgba(17,17,17,.07);border:none;border-radius:14px;padding:15px 20px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(17,17,17,.45);cursor:pointer;font-family:inherit;transition:all .18s}
 .ai-reject:active{opacity:.7}
+
+/* ── REST TIMER ── */
+.rest-timer{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 88px);left:50%;transform:translateX(-50%) translateY(18px);z-index:90;background:#111;border-radius:22px;padding:12px 22px 12px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,.28);opacity:0;transition:opacity .3s cubic-bezier(.25,.8,.25,1),transform .3s cubic-bezier(.25,.8,.25,1);pointer-events:auto;white-space:nowrap}
+.rest-timer.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.rest-timer.done{background:#2DB55D}
+.rt-label{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(250,247,242,.45)}
+.rt-time{font-size:22px;font-weight:100;letter-spacing:-.5px;color:#FAF7F2;font-variant-numeric:tabular-nums;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;min-width:42px;text-align:center}
+.rt-skip{background:none;border:1px solid rgba(250,247,242,.18);border-radius:10px;padding:5px 11px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(250,247,242,.5);cursor:pointer;font-family:inherit;transition:all .18s}
+.rt-skip:active{color:#FAF7F2;border-color:rgba(250,247,242,.5)}
 
 /* ── EDIT SESSION ── */
 .edit-overlay{position:absolute;inset:0;z-index:25;background:#F7F7F5;display:flex;flex-direction:column;opacity:0;pointer-events:none;transform:translateY(16px);transition:opacity .3s cubic-bezier(.25,.8,.25,1),transform .3s cubic-bezier(.25,.8,.25,1)}
@@ -866,7 +874,10 @@ function refreshDone(sessId){
 }
 function toggleDone(){
   if(!curSess)return;const k='pp_sess_'+curSess.sessId;
-  ss(k,ls(k)==='1'?'0':'1');refreshDone(curSess.sessId);
+  const wasOff=ls(k)!=='1';
+  ss(k,wasOff?'1':'0');
+  refreshDone(curSess.sessId);
+  if(wasOff)showConfetti();
 }
 
 /* EXERCISES */
@@ -894,6 +905,15 @@ function toggleSet(sessId,exIdx,si,ns,btn){
   while(sets.length<=si)sets.push(false);sets[si]=!sets[si];
   ss(k,JSON.stringify(sets));
   btn.classList.toggle('on',sets[si]);btn.textContent=sets[si]?'✓':(si+1);
+  if(sets[si]&&curSess){
+    const{pid}=curSess;
+    const sess=SESSIONS[pid].sessions.find(s=>s.id===sessId);
+    const custom=JSON.parse(ls('pp_custom_'+sessId)||'null');
+    const exs=custom||sess?.exercises||[];
+    const ex=exs[exIdx];
+    startRestTimer(getRestSecs(ex?.note||''));
+    checkAllSets(pid,{id:sessId,exercises:exs},ns);
+  }else if(!sets[si]){clearRestTimer();}
 }
 function toggleMait(sessId,exIdx,el){
   const k='pp_mait_'+sessId+'_'+exIdx;const dn=ls(k)!=='1';
@@ -969,7 +989,11 @@ function renderComms(sid){
 </div>`).join('');
 }
 
-function autoRes(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
+function autoRes(el){
+  el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';
+  const btn=el.closest('.comm-right')?.querySelector('.comm-send');
+  if(btn)btn.style.display=el.value.trim()?'block':'none';
+}
 
 function pubComm(sid){
   const inp=document.getElementById('cinp-'+sid);
@@ -979,6 +1003,9 @@ function pubComm(sid){
   comms.unshift({id:Date.now(),content:txt,ts:Date.now(),likes:0,liked:false,reply:null});
   saveComms(sid,comms);
   inp.value='';inp.style.height='';
+  // hide button via JS (no focus-within)
+  const btn=inp?.closest('.comm-right')?.querySelector('.comm-send');
+  if(btn)btn.style.display='none';
   renderComms(sid);
   showToast('Commentaire publié ✓');
 }
@@ -1031,29 +1058,59 @@ const AI_DATA={
   ]
 };
 let _aiCtx=null;
-function openAI(pid,sid){
+async function openAI(pid,sid){
   _aiCtx={pid,sid};
   const panel=document.getElementById('ai-panel');
   const res=document.getElementById('ai-result');
   const load=document.getElementById('ai-loading');
   if(res)res.style.display='none';
-  if(load)load.style.display='flex';
+  if(load){load.style.display='flex';load.querySelector('.ai-load-txt').textContent='Analyse de ta séance...';}
   panel.classList.add('on');
-  setTimeout(()=>{
+
+  // Gather context
+  const sess=SESSIONS[pid].sessions.find(s=>s.id===sid);
+  const custom=JSON.parse(ls('pp_custom_'+sid)||'null');
+  const exs=(custom||sess?.exercises||[]).filter(e=>e);
+  const enriched=exs.map((ex,i)=>{
+    const sets=JSON.parse(ls('pp_sets_'+sid+'_'+i)||'[]');
+    return{...ex,setsCompleted:sets.filter(Boolean).length};
+  });
+  const comments=getComms(sid).slice(0,5).map(c=>c.content);
+
+  function renderSuggs(suggs,bodyTxt){
     if(load)load.style.display='none';
-    if(res){
-      res.style.display='block';
-      const suggs=AI_DATA[pid]||AI_DATA.hs;
-      document.getElementById('ai-sugg-list').innerHTML=suggs.map((s,i)=>`
+    if(!res)return;
+    res.style.display='block';
+    if(bodyTxt){const b=res.querySelector('.ai-res-body');if(b)b.textContent=bodyTxt;}
+    document.getElementById('ai-sugg-list').innerHTML=suggs.map((s,i)=>`
 <div class="ai-sugg" style="animation-delay:${i*.08}s">
-  <div class="ai-sugg-lbl">${s.lbl}</div>
-  <div class="ai-sugg-txt">${s.txt}</div>
+  <div class="ai-sugg-lbl">${esc(s.exercise_title||s.lbl||'Suggestion')}</div>
+  <div class="ai-sugg-txt">${esc(s.change||s.txt||'')}</div>
+  ${s.reason?`<div style="font-size:12px;color:rgba(17,17,17,.42);margin-top:6px;line-height:1.5">${esc(s.reason)}</div>`:''}
 </div>`).join('');
-    }
-  },1600);
+  }
+
+  try{
+    const r=await fetch('/api/optimize',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        session:{id:sid,name:SESSIONS[pid].name+' · Séance '+(sess?.num||''),exercises:enriched},
+        comments,
+        userLevel:'débutante en progression'
+      })
+    });
+    if(!r.ok)throw new Error('API '+r.status);
+    const data=await r.json();
+    renderSuggs(data.suggestions||[],data.global_advice||data.reasoning||'');
+  }catch(err){
+    // Fallback to static suggestions
+    const suggs=AI_DATA[pid]||AI_DATA.hs;
+    renderSuggs(suggs,'Basé sur ta progression et tes performances récentes, voici les ajustements recommandés pour maximiser tes résultats.');
+  }
 }
 function closeAI(){document.getElementById('ai-panel')?.classList.remove('on');}
-function acceptAI(){closeAI();showToast('Suggestions appliquées ✨');}
+function acceptAI(){closeAI();showToast('Suggestions notées ✨');}
 
 /* ══════════════════════════════════════════════
    ÉDITION SÉANCE
@@ -1088,15 +1145,94 @@ function saveEditSession(){
   const{pid,sessId}=curSess;
   const sess=SESSIONS[pid].sessions.find(s=>s.id===sessId);
   const result=sess.exercises.map((ex,i)=>{
-    const n=v=>document.querySelector(`[data-i="${i}"][data-f="${v}"]`)?.value||'';
-    if(!ex&&!n('name'))return null;
-    return{name:n('name')||ex?.name||'',series:n('series')||ex?.series||'',reps:n('reps')||ex?.reps||'',note:n('note')||ex?.note||'',video:n('video')||ex?.video||null};
+    // always read the actual input value — never fall back to original when input exists
+    const get=f=>{const el=document.querySelector(`[data-i="${i}"][data-f="${f}"]`);return el!==null?el.value:(ex?.[f]??'');};
+    const nm=get('name');
+    if(!ex&&!nm)return null;
+    return{name:nm,series:get('series'),reps:get('reps'),note:get('note'),video:get('video')||null};
   });
   ss('pp_custom_'+sessId,JSON.stringify(result));
-  const updated={...sess,exercises:result};
-  buildEx(pid,updated);
+  buildEx(pid,{...sess,exercises:result});
   closeEditSession();
   showToast('Séance enregistrée ✓');
+}
+
+/* ══════════════════════════════════════════════
+   REST TIMER
+══════════════════════════════════════════════ */
+let _timerIv=null,_timerEl=null;
+function fmtSecs(s){const m=Math.floor(s/60),sc=s%60;return`${m}:${String(sc).padStart(2,'0')}`;}
+function getRestSecs(note){
+  if(!note)return 90;
+  const m=note.match(/(\d+)\s*min/i);if(m)return parseInt(m[1])*60;
+  const s=note.match(/(\d+)\s*sec/i);if(s)return parseInt(s[1]);
+  return 90;
+}
+function startRestTimer(secs){
+  clearRestTimer();
+  let rem=secs;
+  const el=document.createElement('div');
+  el.className='rest-timer';
+  el.innerHTML=`<div class="rt-label">Repos</div><div class="rt-time" id="rt-d">${fmtSecs(rem)}</div><button class="rt-skip" onclick="skipTimer()">Passer →</button>`;
+  document.body.appendChild(el);_timerEl=el;
+  requestAnimationFrame(()=>el.classList.add('on'));
+  _timerIv=setInterval(()=>{
+    rem--;
+    const d=document.getElementById('rt-d');if(d)d.textContent=fmtSecs(Math.max(0,rem));
+    if(rem<=0){
+      clearInterval(_timerIv);_timerIv=null;
+      if(navigator.vibrate)navigator.vibrate([200,100,200]);
+      el.classList.add('done');
+      setTimeout(clearRestTimer,1400);
+    }
+  },1000);
+}
+function clearRestTimer(){
+  if(_timerIv){clearInterval(_timerIv);_timerIv=null;}
+  if(_timerEl){_timerEl.style.opacity='0';setTimeout(()=>{_timerEl?.remove();_timerEl=null;},280);}
+}
+function skipTimer(){clearRestTimer();}
+
+/* ══════════════════════════════════════════════
+   CONFETTI
+══════════════════════════════════════════════ */
+function showConfetti(){
+  const cv=document.createElement('canvas');
+  cv.style.cssText='position:fixed;inset:0;z-index:998;pointer-events:none';
+  cv.width=window.innerWidth;cv.height=window.innerHeight;
+  document.body.appendChild(cv);
+  const ctx=cv.getContext('2d');
+  const cols=['#E9B949','#2DB55D','#A878C9','#9A7209','#5AE68A','#EDD68C'];
+  const pieces=Array.from({length:90},()=>({
+    x:Math.random()*cv.width,y:-10-Math.random()*50,
+    r:3+Math.random()*5,col:cols[Math.floor(Math.random()*cols.length)],
+    spd:2.5+Math.random()*3.5,ang:Math.random()*Math.PI*2,
+    spin:(Math.random()-.5)*.18,drift:(Math.random()-.5)*1.8
+  }));
+  let f=0;const max=130;
+  (function anim(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    pieces.forEach(p=>{
+      p.y+=p.spd;p.x+=p.drift;p.ang+=p.spin;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.ang);
+      ctx.fillStyle=p.col;ctx.globalAlpha=Math.max(0,Math.min(1,(max-f)/35));
+      ctx.fillRect(-p.r/2,-p.r*.3,p.r,p.r*.65);
+      ctx.restore();
+    });
+    f++;if(f<max)requestAnimationFrame(anim);else cv.remove();
+  })();
+  if(navigator.vibrate)navigator.vibrate([80,50,80,50,200]);
+}
+function checkAllSets(pid,sess,ns){
+  const realNs=ns||NS[pid];
+  const hasAny=sess.exercises.some(e=>e);
+  if(!hasAny)return;
+  const allDone=sess.exercises.every((ex,i)=>{
+    if(!ex)return true;
+    const max=Math.min(parseInt(ex.series)||realNs,realNs);
+    return JSON.parse(ls('pp_sets_'+sess.id+'_'+i)||'[]').filter(Boolean).length>=max;
+  });
+  if(allDone)showConfetti();
 }
 
 /* ══════════════════════════════════════════════
