@@ -1382,7 +1382,15 @@ function checkAllSets(pid,sess,ns){
     const max=Math.min(parseInt(ex.series)||realNs,realNs);
     return JSON.parse(ls('pp_sets_'+sess.id+'_'+i)||'[]').filter(Boolean).length>=max;
   });
-  if(allDone)showConfetti();
+  if(allDone){
+    showConfetti();
+    const k='pp_sess_'+sess.id;
+    if(ls(k)!=='1'){
+      ss(k,'1');
+      refreshDone(sess.id);
+      showToast('Séance complétée automatiquement 🎉');
+    }
+  }
 }
 
 /* ══════════════════════════════════════════════
