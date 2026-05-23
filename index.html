@@ -406,6 +406,36 @@ body.app-on #cv{opacity:0}
 .edit-del{float:right;background:none;border:none;cursor:pointer;font-size:18px;color:rgba(17,17,17,.25);padding:0 0 4px 8px;line-height:1;transition:color .18s}
 .edit-del:active{color:#E05050}
 
+/* ── PIÈCES JOINTES (vidéos) ── */
+.attach-wrap{padding:20px 22px 4px;border-top:1px solid var(--b)}
+.attach-lbl{font-size:9px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.attach-lbl::after{content:'';flex:1;height:1px;background:var(--b)}
+.attach-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.attach-item{display:flex;align-items:center;gap:12px;background:var(--s1);border:1px solid var(--b);border-radius:14px;padding:13px 14px;animation:fadeUp .25s ease both}
+.attach-ic{font-size:22px;flex-shrink:0}
+.attach-info{flex:1;min-width:0}
+.attach-name{font-size:13px;font-weight:600;color:var(--t);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.attach-meta{font-size:11px;color:var(--t2)}
+.attach-open{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g);text-decoration:none;flex-shrink:0;padding:6px 10px;background:var(--g-dim);border-radius:8px;border:1px solid var(--bg);transition:all .18s}
+.attach-open:active{opacity:.7}
+.attach-del{background:none;border:none;cursor:pointer;font-size:18px;color:var(--t3);padding:4px 4px 4px 8px;flex-shrink:0;line-height:1;transition:color .18s}
+.attach-del:active{color:#E05050}
+.attach-add{display:flex;align-items:center;gap:10px;width:100%;background:none;border:1.5px dashed var(--b);border-radius:14px;padding:14px 16px;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--t3);cursor:pointer;font-family:inherit;transition:all .2s;margin-bottom:4px}
+.attach-add:active{background:var(--s1)}
+/* Modal ajout */
+.attach-modal{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.48);display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .28s cubic-bezier(.25,.8,.25,1)}
+.attach-modal.on{opacity:1;pointer-events:auto}
+.attach-sheet{background:#F7F7F5;border-radius:22px 22px 0 0;padding:28px 22px max(env(safe-area-inset-bottom,0px),28px);width:100%;transform:translateY(100%);transition:transform .32s cubic-bezier(.25,.8,.25,1)}
+.attach-modal.on .attach-sheet{transform:translateY(0)}
+.attach-sheet-ttl{font-size:15px;font-weight:700;color:#111;margin-bottom:20px}
+.attach-inp{width:100%;background:#fff;border:1px solid rgba(17,17,17,.09);border-radius:12px;padding:14px 15px;font-size:14px;color:#111;font-family:inherit;outline:none;margin-bottom:10px;display:block;-webkit-appearance:none;transition:border-color .2s,box-shadow .2s}
+.attach-inp:focus{border-color:#E9B949;box-shadow:0 0 0 3px rgba(233,185,73,.15)}
+.attach-inp::placeholder{color:rgba(17,17,17,.3)}
+.attach-actions{display:flex;gap:10px;margin-top:4px}
+.attach-save{flex:1;background:#E9B949;border:none;border-radius:13px;padding:15px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#5A3A00;cursor:pointer;font-family:inherit;transition:all .18s}
+.attach-save:active{opacity:.8;transform:scale(.98)}
+.attach-cancel-btn{background:rgba(17,17,17,.07);border:none;border-radius:13px;padding:15px 20px;font-size:12px;font-weight:700;color:rgba(17,17,17,.45);cursor:pointer;font-family:inherit;transition:all .18s}
+
 /* ── TOAST ── */
 .toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);left:50%;transform:translateX(-50%);background:#111;color:#FAF7F2;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;letter-spacing:.04em;z-index:999;white-space:nowrap;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.25)}
 
@@ -578,6 +608,19 @@ body.app-on #cv{opacity:0}
           <button class="ai-accept" onclick="acceptAI()">Appliquer les suggestions ✨</button>
           <button class="ai-reject" onclick="closeAI()">Ignorer</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PIÈCES JOINTES -->
+  <div class="attach-modal" id="attach-modal" onclick="if(event.target===this)closeAttachModal()">
+    <div class="attach-sheet">
+      <div class="attach-sheet-ttl">📎 Ajouter une vidéo</div>
+      <input class="attach-inp" id="atch-inp-label" placeholder="Titre (ex: Séance du 23 mai)"/>
+      <input class="attach-inp" id="atch-inp-url" type="url" placeholder="Lien vidéo (YouTube, Drive...)"/>
+      <div class="attach-actions">
+        <button class="attach-save" onclick="saveAttachEntry()">Ajouter →</button>
+        <button class="attach-cancel-btn" onclick="closeAttachModal()">Annuler</button>
       </div>
     </div>
   </div>
@@ -1120,6 +1163,13 @@ function buildCommMain(pid,sess){
   const el=document.getElementById('comm-main');
   if(!el)return;
   el.innerHTML=`
+<div class="attach-wrap">
+  <div class="attach-lbl">Pièces jointes</div>
+  <div class="attach-list" id="atch-list-${sid}"></div>
+  <button class="attach-add" onclick="openAttachModal('${sid}')">
+    <span style="font-size:18px">📎</span> Ajouter une vidéo
+  </button>
+</div>
 <div class="note-wrap">
   <div class="note-lbl">Notes personnelles</div>
   <textarea class="note-area" id="note-${sid}" placeholder="Ressenti, douleurs, progrès... sauvegarde automatique">${esc(note)}</textarea>
@@ -1143,6 +1193,7 @@ function buildCommMain(pid,sess){
     <div class="ai-arr">→</div>
   </button>
 </div>`;
+  renderAttach(sid);
   renderComms(sid);
   setupNoteAutosave(sid);
 }
@@ -1329,6 +1380,59 @@ function saveEditSession(){
   buildEx(pid,{...sess,exercises:result});
   closeEditSession();
   showToast('Séance enregistrée ✓');
+}
+
+/* ══════════════════════════════════════════════
+   PIÈCES JOINTES (vidéos)
+══════════════════════════════════════════════ */
+function getAttach(sid){return JSON.parse(ls('pp_attach_'+sid)||'[]');}
+function saveAttach(sid,arr){ss('pp_attach_'+sid,JSON.stringify(arr));}
+function renderAttach(sid){
+  const list=document.getElementById('atch-list-'+sid);
+  if(!list)return;
+  const items=getAttach(sid);
+  if(!items.length){list.innerHTML='';return;}
+  list.innerHTML=items.map((a,i)=>`
+<div class="attach-item">
+  <div class="attach-ic">🎥</div>
+  <div class="attach-info">
+    <div class="attach-name">${esc(a.label||'Vidéo')}</div>
+    <div class="attach-meta">${a.date||''}</div>
+  </div>
+  <a class="attach-open" href="${esc(a.url)}" target="_blank">Voir →</a>
+  <button class="attach-del" onclick="delAttach('${sid}',${i})">×</button>
+</div>`).join('');
+}
+let _attachSid=null;
+function openAttachModal(sid){
+  _attachSid=sid;
+  const m=document.getElementById('attach-modal');if(!m)return;
+  document.getElementById('atch-inp-label').value='';
+  document.getElementById('atch-inp-url').value='';
+  m.classList.add('on');
+  setTimeout(()=>document.getElementById('atch-inp-label').focus(),350);
+}
+function closeAttachModal(){
+  document.getElementById('attach-modal')?.classList.remove('on');
+  _attachSid=null;
+}
+function saveAttachEntry(){
+  if(!_attachSid)return;
+  const label=(document.getElementById('atch-inp-label')?.value||'').trim();
+  const url=(document.getElementById('atch-inp-url')?.value||'').trim();
+  if(!url){showToast('Ajoute un lien vidéo 🎥');return;}
+  const items=getAttach(_attachSid);
+  const n=new Date();
+  const d=n.getDate()+'/'+(n.getMonth()+1)+'/'+n.getFullYear();
+  items.push({id:Date.now(),label:label||'Vidéo du '+d,url,date:d});
+  saveAttach(_attachSid,items);
+  renderAttach(_attachSid);
+  closeAttachModal();
+  showToast('Vidéo ajoutée ✓');
+}
+function delAttach(sid,idx){
+  const items=getAttach(sid);items.splice(idx,1);
+  saveAttach(sid,items);renderAttach(sid);
 }
 
 /* ══════════════════════════════════════════════
