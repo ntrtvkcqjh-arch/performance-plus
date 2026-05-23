@@ -682,6 +682,17 @@ const COACH_DEFAULT=[
 let curTab='home',curProg=null,curSess=null;
 const ls=k=>localStorage.getItem(k);
 const ss=(k,v)=>localStorage.setItem(k,v);
+
+/* ── MIGRATION v3 : supprime les saves all-null des sessions qui ont maintenant de vrais exercices ── */
+(function migrate(){
+  if(ls('pp_migr')==='3')return;
+  ['pr1','pr2','pr3','hs1','hs2'].forEach(id=>{
+    const raw=localStorage.getItem('pp_custom_'+id);
+    if(!raw)return;
+    try{const d=JSON.parse(raw);if(Array.isArray(d)&&!d.some(e=>e&&e.name))localStorage.removeItem('pp_custom_'+id);}catch(e){}
+  });
+  ss('pp_migr','3');
+})();
 const tx=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t};
 
 /* AUTH FLOW */
