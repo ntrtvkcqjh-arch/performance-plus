@@ -635,52 +635,69 @@ body.coach-mode .comm-av,body.coach-mode .ex-comm-av{background:rgba(59,130,246,
 .clock-date{font-size:11px;color:var(--t2);letter-spacing:.04em;white-space:nowrap}
 
 /* ══════════════════════════════════════════════
-   MESSAGERIE — bulle iMessage
+   MESSAGERIE — bulle flottante compacte
 ══════════════════════════════════════════════ */
-/* FAB flottant */
-.chat-fab{position:fixed;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 78px);z-index:50;width:52px;height:52px;border-radius:50%;background:#111111;border:none;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 22px rgba(0,0,0,.28),0 0 0 1px rgba(255,255,255,.06);transition:transform .18s cubic-bezier(.2,.8,.3,1);-webkit-tap-highlight-color:transparent;color:inherit}
-.chat-fab:active{transform:scale(.90)}
-body.coach-mode .chat-fab{background:#1D3461;box-shadow:0 4px 22px rgba(29,52,97,.35)}
-/* Badge rouge non-lu */
-.chat-badge{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;background:#E05050;border-radius:99px;font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 5px;border:2.5px solid #F7F7F5;letter-spacing:.01em}
+/* FAB */
+.chat-fab{position:fixed;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 78px);z-index:55;width:50px;height:50px;border-radius:50%;background:#111111;border:none;cursor:pointer;font-size:21px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.26),0 0 0 1px rgba(255,255,255,.06);transition:transform .18s cubic-bezier(.2,.8,.3,1),background .18s;-webkit-tap-highlight-color:transparent;color:inherit}
+.chat-fab:active{transform:scale(.88)}
+.chat-fab.open{background:#444;font-size:17px}
+body.coach-mode .chat-fab{background:#1D3461}
+body.coach-mode .chat-fab.open{background:#2A4A8A}
+/* Badge non-lu */
+.chat-badge{position:absolute;top:-4px;right:-4px;min-width:19px;height:19px;background:#E05050;border-radius:99px;font-size:10px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid #F7F7F5}
 body.coach-mode .chat-badge{border-color:#F2F5FB}
-/* Overlay plein écran */
-.chat-overlay{position:fixed;inset:0;z-index:60;background:#F7F7F5;display:flex;flex-direction:column;opacity:0;pointer-events:none;transform:translateY(36px);transition:opacity .34s cubic-bezier(.25,.8,.25,1),transform .34s cubic-bezier(.25,.8,.25,1)}
-.chat-overlay.on{opacity:1;pointer-events:auto;transform:translateY(0)}
+/* Panneau flottant compact — pop depuis le FAB */
+.chat-overlay{
+  position:fixed;
+  bottom:calc(env(safe-area-inset-bottom,0px) + 136px);
+  right:14px;
+  width:min(320px,calc(100vw - 28px));
+  height:min(420px,calc(100vh - 180px));
+  background:#F7F7F5;
+  border-radius:20px;
+  box-shadow:0 16px 56px rgba(0,0,0,.22),0 2px 12px rgba(0,0,0,.1),0 0 0 .5px rgba(0,0,0,.06);
+  display:flex;flex-direction:column;overflow:hidden;
+  z-index:54;
+  opacity:0;pointer-events:none;
+  transform:scale(.88) translateY(18px);
+  transform-origin:bottom right;
+  transition:opacity .26s cubic-bezier(.25,.8,.25,1),transform .26s cubic-bezier(.25,.8,.25,1);
+}
+.chat-overlay.on{opacity:1;pointer-events:auto;transform:scale(1) translateY(0)}
 body.coach-mode .chat-overlay{background:#F2F5FB}
-/* Navbar chat */
-.chat-nb{display:flex;align-items:center;justify-content:space-between;padding:0 18px;padding-top:max(env(safe-area-inset-top,0px),14px);padding-bottom:14px;border-bottom:1px solid rgba(17,17,17,.07);background:rgba(247,247,245,.97);backdrop-filter:blur(30px);flex-shrink:0}
-body.coach-mode .chat-nb{background:rgba(242,245,251,.97);border-bottom-color:rgba(59,130,246,.10)}
-.chat-close{background:none;border:none;cursor:pointer;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--g);font-family:inherit;padding:8px 0;transition:opacity .2s;width:64px;text-align:left}
-.chat-close:active{opacity:.6}
-/* En-tête partenaire */
-.chat-partner-wrap{display:flex;align-items:center;gap:10px}
-.chat-partner-av{width:36px;height:36px;border-radius:50%;background:var(--g-dim);border:1.5px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--g);flex-shrink:0}
+/* Header compact */
+.chat-nb{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 14px;border-bottom:1px solid rgba(17,17,17,.07);background:rgba(247,247,245,.98);flex-shrink:0}
+body.coach-mode .chat-nb{background:rgba(242,245,251,.98);border-bottom-color:rgba(59,130,246,.09)}
+.chat-close{background:none;border:none;cursor:pointer;font-size:17px;color:rgba(17,17,17,.35);padding:8px;line-height:1;transition:color .18s;-webkit-tap-highlight-color:transparent}
+.chat-close:active{color:#111}
+/* Partenaire */
+.chat-partner-wrap{display:flex;align-items:center;gap:8px}
+.chat-partner-av{width:30px;height:30px;border-radius:50%;background:var(--g-dim);border:1.5px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--g);flex-shrink:0}
 .chat-partner-name{font-size:13px;font-weight:700;color:#111;letter-spacing:.01em}
-.chat-partner-sub{font-size:10px;color:rgba(17,17,17,.4);letter-spacing:.06em;text-transform:uppercase}
+.chat-partner-sub{font-size:9px;color:rgba(17,17,17,.38);letter-spacing:.07em;text-transform:uppercase}
 /* Zone messages */
-.chat-msgs{flex:1;overflow-y:auto;padding:20px 16px 12px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
+.chat-msgs{flex:1;overflow-y:auto;padding:12px 12px 8px;display:flex;flex-direction:column;gap:7px;-webkit-overflow-scrolling:touch}
 .chat-msgs::-webkit-scrollbar{display:none}
-.chat-empty{text-align:center;font-size:13px;color:rgba(17,17,17,.36);letter-spacing:.04em;margin:auto;padding:32px 0}
+.chat-empty{text-align:center;font-size:12px;color:rgba(17,17,17,.35);letter-spacing:.03em;margin:auto;padding:20px 0}
 /* Bulles */
-.chat-msg{display:flex;flex-direction:column;max-width:82%;animation:fadeUp .22s ease both}
+.chat-msg{display:flex;flex-direction:column;max-width:84%;animation:fadeUp .2s ease both}
 .chat-msg.me{align-self:flex-end;align-items:flex-end}
 .chat-msg.them{align-self:flex-start;align-items:flex-start}
-.chat-bubble{padding:11px 15px;font-size:15px;line-height:1.48;word-break:break-word;box-shadow:0 1px 8px rgba(0,0,0,.07)}
-.chat-msg.me .chat-bubble{background:var(--g2);color:#5A3A00;border-radius:20px 20px 5px 20px}
-.chat-msg.them .chat-bubble{background:#E8E8EA;color:#111;border-radius:20px 20px 20px 5px}
+.chat-bubble{padding:9px 13px;font-size:14px;line-height:1.45;word-break:break-word}
+.chat-msg.me .chat-bubble{background:var(--g2);color:#5A3A00;border-radius:18px 18px 4px 18px}
+.chat-msg.them .chat-bubble{background:#E8E8EA;color:#111;border-radius:18px 18px 18px 4px}
 body.coach-mode .chat-msg.me .chat-bubble{background:#1A56CC;color:#fff}
-.chat-time{font-size:10px;color:rgba(17,17,17,.30);margin-top:4px;letter-spacing:.02em;padding:0 5px}
-/* Barre de composition */
-.chat-compose{display:flex;align-items:flex-end;gap:10px;padding:12px 14px;padding-bottom:max(env(safe-area-inset-bottom,0px),16px);background:#F7F7F5;border-top:1px solid rgba(17,17,17,.07);flex-shrink:0}
-body.coach-mode .chat-compose{background:#F2F5FB;border-top-color:rgba(59,130,246,.10)}
-.chat-inp{flex:1;background:#fff;border:1.5px solid rgba(17,17,17,.11);border-radius:22px;padding:10px 16px;font-size:15px;color:#111;font-family:inherit;resize:none;outline:none;line-height:1.42;min-height:42px;max-height:100px;overflow-y:auto;transition:border-color .22s,box-shadow .22s;display:block}
+.chat-time{font-size:9px;color:rgba(17,17,17,.28);margin-top:3px;padding:0 4px}
+/* Barre de composition compacte */
+.chat-compose{display:flex;align-items:flex-end;gap:8px;padding:9px 10px;background:#F7F7F5;border-top:1px solid rgba(17,17,17,.07);flex-shrink:0}
+body.coach-mode .chat-compose{background:#F2F5FB;border-top-color:rgba(59,130,246,.09)}
+.chat-inp{flex:1;background:#fff;border:1.5px solid rgba(17,17,17,.10);border-radius:18px;padding:8px 13px;font-size:14px;color:#111;font-family:inherit;resize:none;outline:none;line-height:1.4;min-height:36px;max-height:80px;overflow-y:auto;transition:border-color .2s,box-shadow .2s;display:block}
 .chat-inp:focus{border-color:var(--g2);box-shadow:0 0 0 3px rgba(233,185,73,.12)}
-.chat-inp::placeholder{color:rgba(17,17,17,.3);font-size:14px}
+.chat-inp::placeholder{color:rgba(17,17,17,.3);font-size:13px}
 body.coach-mode .chat-inp:focus{border-color:#3B82F6;box-shadow:0 0 0 3px rgba(59,130,246,.12)}
-.chat-send{width:42px;height:42px;min-width:42px;border-radius:50%;background:var(--g2);border:none;cursor:pointer;font-size:20px;color:#5A3A00;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s;line-height:1;padding-bottom:2px}
-.chat-send:disabled{background:rgba(17,17,17,.09);color:rgba(17,17,17,.28);cursor:default}
-.chat-send:not(:disabled):active{transform:scale(.88);opacity:.82}
+.chat-send{width:36px;height:36px;min-width:36px;border-radius:50%;background:var(--g2);border:none;cursor:pointer;font-size:17px;color:#5A3A00;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s;padding-bottom:1px}
+.chat-send:disabled{background:rgba(17,17,17,.08);color:rgba(17,17,17,.25);cursor:default}
+.chat-send:not(:disabled):active{transform:scale(.86)}
 body.coach-mode .chat-send:not(:disabled){background:#1A56CC;color:#fff}
 </style>
 </head>
@@ -921,15 +938,14 @@ body.coach-mode .chat-send:not(:disabled){background:#1A56CC;color:#fff}
   </div>
 
   <!-- CHAT FAB -->
-  <button class="chat-fab" id="chat-fab" onclick="openChat()">
-    💬
+  <button class="chat-fab" id="chat-fab" onclick="toggleChat()">
+    <span id="chat-fab-ic">💬</span>
     <div class="chat-badge" id="chat-badge" style="display:none">0</div>
   </button>
 
-  <!-- CHAT OVERLAY iMessage -->
+  <!-- CHAT PANNEAU COMPACT -->
   <div class="chat-overlay" id="chat-overlay">
     <div class="chat-nb">
-      <button class="chat-close" onclick="closeChat()">← Retour</button>
       <div class="chat-partner-wrap">
         <div class="chat-partner-av" id="chat-partner-av">J</div>
         <div>
@@ -937,13 +953,13 @@ body.coach-mode .chat-send:not(:disabled){background:#1A56CC;color:#fff}
           <div class="chat-partner-sub">Performance+</div>
         </div>
       </div>
-      <div style="width:64px"></div>
+      <button class="chat-close" onclick="closeChat()">✕</button>
     </div>
     <div class="chat-msgs" id="chat-msgs">
       <div class="chat-empty">Aucun message · Commence la conversation 💬</div>
     </div>
     <div class="chat-compose">
-      <textarea class="chat-inp" id="chat-inp" placeholder="Envoyer un message…" rows="1"
+      <textarea class="chat-inp" id="chat-inp" placeholder="Écrire un message…" rows="1"
         oninput="autoResChat(this)"
         onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter'){sendMsg();event.preventDefault();}"></textarea>
       <button class="chat-send" id="chat-send" onclick="sendMsg()" disabled>↑</button>
@@ -2238,7 +2254,13 @@ async function renderMsgs(){
   }
 }
 
-/* Ouvre l'overlay chat */
+/* Bascule ouverture/fermeture */
+function toggleChat(){
+  const ov=document.getElementById('chat-overlay');
+  if(ov?.classList.contains('on'))closeChat();else openChat();
+}
+
+/* Ouvre le panneau chat */
 function openChat(){
   const ov=document.getElementById('chat-overlay');if(!ov)return;
   const partnerName=isCoach()?'Marjana — Cliente':'Julian — Coach';
@@ -2254,20 +2276,26 @@ function openChat(){
   }
   setLastRead();
   ov.classList.add('on');
+  /* FAB → icône ✕ */
+  const fab=document.getElementById('chat-fab');
+  const ic=document.getElementById('chat-fab-ic');
+  if(fab)fab.classList.add('open');
+  if(ic)ic.textContent='✕';
   renderMsgs();
   updateChatBadge();
-  const fab=document.getElementById('chat-fab');
-  if(fab)fab.style.display='none';
-  setTimeout(()=>document.getElementById('chat-inp')?.focus(),400);
+  setTimeout(()=>document.getElementById('chat-inp')?.focus(),300);
 }
 
-/* Ferme l'overlay chat */
+/* Ferme le panneau chat */
 function closeChat(){
   document.getElementById('chat-overlay')?.classList.remove('on');
   setLastRead();
   updateChatBadge();
+  /* FAB → icône 💬 */
   const fab=document.getElementById('chat-fab');
-  if(fab)fab.style.display='flex';
+  const ic=document.getElementById('chat-fab-ic');
+  if(fab)fab.classList.remove('open');
+  if(ic)ic.textContent='💬';
 }
 
 /* Envoie un message vers Supabase */
