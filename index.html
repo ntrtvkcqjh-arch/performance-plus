@@ -6,6 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <title>Performance Plus</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -2178,52 +2179,68 @@ function showToast(msg){
 }
 
 /* ══════════════════════════════════════════════
-   MESSAGERIE iMessage — Marjana ↔ Julian
+   MESSAGERIE — Supabase Realtime (cross-device)
 ══════════════════════════════════════════════ */
-function getMsgs(){return JSON.parse(localStorage.getItem('pp_msgs')||'[]');}
-function saveMsgs(arr){localStorage.setItem('pp_msgs',JSON.stringify(arr));}
-function getLastRead(){return parseInt(localStorage.getItem('pp_lastread_'+(_role||''))||'0');}
-function setLastRead(){localStorage.setItem('pp_lastread_'+(_role||''),String(Date.now()));}
-
-/* Compte les messages non-lus reçus par le rôle actuel */
-function _countUnread(){
-  const msgs=getMsgs();
-  const lr=getLastRead();
-  return msgs.filter(m=>m.author!==_role&&m.ts>lr).length;
+const _SUPA_URL='https://vghzcakcpxqiyzegqpov.supabase.co';
+const _SUPA_KEY='sb_publishable_IJBnH2oNqtrvh8ceyAWddg_R171Z9Z_';
+let _supaClient=null;
+function _supa(){
+  if(!_supaClient)_supaClient=supabase.createClient(_SUPA_URL,_SUPA_KEY);
+  return _supaClient;
 }
 
-function updateChatBadge(){
-  const n=_countUnread();
-  const badge=document.getElementById('chat-badge');
-  if(!badge)return;
-  badge.textContent=n>9?'9+':String(n);
-  badge.style.display=n>0?'flex':'none';
+/* Timestamp local de dernière lecture (par rôle) */
+function getLastRead(){return parseInt(localStorage.getItem('pp_lr_'+(_role||''))||'0');}
+function setLastRead(){localStorage.setItem('pp_lr_'+(_role||''),String(Date.now()));}
+
+/* Récupère tous les messages depuis Supabase */
+async function _fetchMsgs(){
+  const{data,error}=await _supa().from('pp_messages').select('*').order('created_at',{ascending:true});
+  if(error)throw error;
+  return data||[];
 }
 
-function renderMsgs(){
+/* Met à jour le badge rouge non-lus */
+async function updateChatBadge(){
+  try{
+    const msgs=await _fetchMsgs();
+    const lr=getLastRead();
+    const unread=msgs.filter(m=>m.author!==_role&&new Date(m.created_at).getTime()>lr).length;
+    const badge=document.getElementById('chat-badge');
+    if(!badge)return;
+    badge.textContent=unread>9?'9+':String(unread);
+    badge.style.display=unread>0?'flex':'none';
+  }catch(e){}
+}
+
+/* Affiche les bulles dans la vue chat */
+async function renderMsgs(){
   const el=document.getElementById('chat-msgs');
   if(!el)return;
-  const msgs=getMsgs();
-  if(!msgs.length){
-    el.innerHTML='<div class="chat-empty">Aucun message · Commence la conversation 💬</div>';
-    return;
+  try{
+    const msgs=await _fetchMsgs();
+    if(!msgs.length){
+      el.innerHTML='<div class="chat-empty">Aucun message · Commence la conversation 💬</div>';
+      return;
+    }
+    el.innerHTML=msgs.map(m=>{
+      const mine=m.author===_role;
+      const who=m.author==='julian'?'Julian — Coach':'Marjana';
+      const ts=new Date(m.created_at).getTime();
+      return`<div class="chat-msg ${mine?'me':'them'}">
+        <div class="chat-bubble">${esc(m.content)}</div>
+        <div class="chat-time">${!mine?who+' · ':''}${fmtTime(ts)}</div>
+      </div>`;
+    }).join('');
+    setTimeout(()=>el.scrollTo({top:el.scrollHeight,behavior:'auto'}),30);
+  }catch(e){
+    el.innerHTML='<div class="chat-empty">Erreur de connexion 📡 · Vérifie internet</div>';
   }
-  el.innerHTML=msgs.map(m=>{
-    const mine=m.author===_role;
-    const who=m.author==='julian'?'Julian — Coach':'Marjana';
-    return`<div class="chat-msg ${mine?'me':'them'}">
-      <div class="chat-bubble">${esc(m.content)}</div>
-      <div class="chat-time">${!mine?who+' · ':''}${fmtTime(m.ts)}</div>
-    </div>`;
-  }).join('');
-  /* Scroll en bas */
-  setTimeout(()=>el.scrollTo({top:el.scrollHeight,behavior:'auto'}),30);
 }
 
+/* Ouvre l'overlay chat */
 function openChat(){
-  const ov=document.getElementById('chat-overlay');
-  if(!ov)return;
-  /* Infos partenaire selon le rôle */
+  const ov=document.getElementById('chat-overlay');if(!ov)return;
   const partnerName=isCoach()?'Marjana — Cliente':'Julian — Coach';
   const partnerAv=isCoach()?'M':'J';
   const pEl=document.getElementById('chat-partner');
@@ -2239,12 +2256,12 @@ function openChat(){
   ov.classList.add('on');
   renderMsgs();
   updateChatBadge();
-  /* Masquer le FAB pendant l'overlay */
   const fab=document.getElementById('chat-fab');
   if(fab)fab.style.display='none';
   setTimeout(()=>document.getElementById('chat-inp')?.focus(),400);
 }
 
+/* Ferme l'overlay chat */
 function closeChat(){
   document.getElementById('chat-overlay')?.classList.remove('on');
   setLastRead();
@@ -2253,28 +2270,22 @@ function closeChat(){
   if(fab)fab.style.display='flex';
 }
 
-function sendMsg(){
+/* Envoie un message vers Supabase */
+async function sendMsg(){
   const inp=document.getElementById('chat-inp');
-  const txt=(inp?.value||'').trim();
-  if(!txt)return;
-  const msgs=getMsgs();
-  msgs.push({id:Date.now(),content:txt,ts:Date.now(),author:_role});
-  saveMsgs(msgs);
-  inp.value='';
-  inp.style.height='42px';
+  const txt=(inp?.value||'').trim();if(!txt)return;
   const btn=document.getElementById('chat-send');
+  /* Vider l'input immédiatement (UX optimiste) */
+  inp.value='';inp.style.height='42px';
   if(btn)btn.disabled=true;
-  renderMsgs();
-  /* Notif navigateur pour l'autre personne (même appareil, app en arrière-plan) */
-  if('Notification' in window&&Notification.permission==='granted'){
-    const from=isCoach()?'Julian — Coach':'Marjana';
-    try{
-      new Notification('Performance+ · Nouveau message',{
-        body:from+' : '+txt.slice(0,100),
-        tag:'pp-chat',
-        icon:'/favicon.ico'
-      });
-    }catch(e){}
+  try{
+    const{error}=await _supa().from('pp_messages').insert({content:txt,author:_role});
+    if(error)throw error;
+    /* Le Realtime va déclencher renderMsgs automatiquement */
+  }catch(e){
+    showToast('Erreur envoi · Vérifie ta connexion 📡');
+    inp.value=txt;/* Restore */
+    if(btn)btn.disabled=false;
   }
 }
 
@@ -2285,21 +2296,37 @@ function autoResChat(el){
   if(btn)btn.disabled=!el.value.trim();
 }
 
-let _chatPollIv=null;
+/* Realtime subscription — reçoit les nouveaux messages en temps réel */
+let _chatChannel=null;
 function initChat(){
   updateChatBadge();
-  /* Demander la permission de notifs (une seule fois) */
   if('Notification' in window&&Notification.permission==='default'){
     Notification.requestPermission();
   }
-  /* Polling 5 s — rafraîchit le badge et la vue si ouverte */
-  if(_chatPollIv)clearInterval(_chatPollIv);
-  _chatPollIv=setInterval(()=>{
-    updateChatBadge();
-    if(document.getElementById('chat-overlay')?.classList.contains('on')){
-      renderMsgs();
-    }
-  },5000);
+  /* Nettoyer l'ancien channel si reconnexion */
+  if(_chatChannel){_supa().removeChannel(_chatChannel);_chatChannel=null;}
+  _chatChannel=_supa()
+    .channel('pp_msgs_rt')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'pp_messages'},payload=>{
+      const msg=payload.new;
+      /* Rafraîchir le badge */
+      updateChatBadge();
+      /* Si le chat est ouvert → rerendre les bulles */
+      if(document.getElementById('chat-overlay')?.classList.contains('on')){
+        renderMsgs();
+      }
+      /* Notif navigateur si message de l'autre personne */
+      if(msg.author!==_role&&'Notification' in window&&Notification.permission==='granted'){
+        const from=msg.author==='julian'?'Julian — Coach':'Marjana';
+        try{
+          new Notification('Performance+ · Nouveau message',{
+            body:from+' : '+String(msg.content).slice(0,100),
+            tag:'pp-chat'
+          });
+        }catch(e){}
+      }
+    })
+    .subscribe();
 }
 </script>
 </body>
