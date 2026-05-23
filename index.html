@@ -453,7 +453,43 @@ body.coach-mode .coach-only-flex{display:flex!important}
 /* badge rôle dans le header */
 .role-badge{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:20px;margin-left:8px}
 .role-badge.marjana{background:rgba(233,185,73,.18);color:#9A7209}
-.role-badge.julian{background:rgba(74,144,226,.15);color:#2260A8}
+.role-badge.julian{background:rgba(59,130,246,.14);color:#1A56CC}
+
+/* ══════════════════════════════════════════════
+   ADMIN / COACH MODE — thème bleu professionnel
+══════════════════════════════════════════════ */
+body.coach-mode #app{
+  --g:#1A56CC;
+  --g2:#3B82F6;
+  --g-dim:rgba(59,130,246,.11);
+  --g-glow:rgba(59,130,246,.2);
+  --bg:rgba(59,130,246,.16);
+  --bg-base:#F2F5FB;
+  background:#F2F5FB;
+}
+/* Lueur bleue en haut */
+body.coach-mode #app::before{background:radial-gradient(ellipse 150% 28% at 50% -6%,rgba(59,130,246,.13) 0%,transparent 55%)}
+/* Navbar */
+body.coach-mode #app .nb{background:rgba(242,245,251,.95);border-bottom-color:rgba(59,130,246,.12)}
+/* Tabbar */
+body.coach-mode #app .tabbar{background:rgba(242,245,251,.97);border-top-color:rgba(59,130,246,.12)}
+/* Onglet actif — remplace le glow or par du bleu */
+body.coach-mode #app .tab.on .tab-dot{box-shadow:0 0 8px rgba(59,130,246,.55)}
+/* Badge P+ → pastille ADMIN */
+body.coach-mode .nb-mark{background:#1D3461;color:#60A5FA;padding:3px 10px;border-radius:7px;font-size:8px;letter-spacing:.16em}
+/* Hero */
+body.coach-mode .hero{background:linear-gradient(170deg,#EAF0FD 0%,#F2F5FB 70%)}
+body.coach-mode .hero-profile{border-color:rgba(59,130,246,.12);background:rgba(59,130,246,.04)}
+body.coach-mode .hero-av{background:rgba(59,130,246,.16)!important;border-color:rgba(59,130,246,.28)!important;color:#1A56CC!important}
+body.coach-mode .hero-greet{background:linear-gradient(90deg,#1A56CC,#3B82F6);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* Bouton IA */
+body.coach-mode .ai-btn{background:#1D3461;box-shadow:0 4px 24px rgba(29,52,97,.2)}
+body.coach-mode .ai-btn::before{background:linear-gradient(135deg,rgba(59,130,246,.2) 0%,transparent 60%)}
+body.coach-mode .ai-arr{color:#60A5FA}
+/* Section cards */
+body.coach-mode .sess-card:hover{border-color:rgba(59,130,246,.25)}
+/* Comm avatar Marjana en bleu pastel dans l'admin */
+body.coach-mode .comm-av,body.coach-mode .ex-comm-av{background:rgba(59,130,246,.1)!important;border-color:rgba(59,130,246,.2)!important;color:#1A56CC!important}
 /* ── ADD BLOCK BUTTON ── */
 .add-block-btn{display:block;width:100%;background:none;border:1px dashed rgba(17,17,17,.15);border-radius:14px;padding:16px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(17,17,17,.4);cursor:pointer;font-family:inherit;margin-top:4px;transition:all .2s}
 .add-block-btn:active{background:rgba(17,17,17,.04)}
@@ -948,15 +984,14 @@ function logout(){
 
 function _applyRoleUI(){
   if(isCoach()){
-    // Accueil Julian
-    const greet=document.getElementById('h-greet');
-    if(greet)greet.textContent='Bonsoir Julian 👋';
     const tagline=document.getElementById('h-tagline');
     if(tagline)tagline.textContent='Tableau de bord coach · Performance+';
     const av=document.querySelector('.hero-av');
-    if(av){av.textContent='J';av.style.background='rgba(74,144,226,.18)';av.style.color='#2260A8';}
+    if(av)av.textContent='J';
     const pname=document.querySelector('.hero-pname');
     if(pname)pname.textContent='Julian — Coach';
+    // Remplacer tous les badges P+ par ADMIN
+    document.querySelectorAll('.nb-mark').forEach(el=>el.textContent='ADMIN');
   }
   // Badge rôle dans le hero
   const psub=document.querySelector('.hero-psub');
@@ -964,7 +999,7 @@ function _applyRoleUI(){
     const badge=document.createElement('span');
     badge.id='role-badge';
     badge.className='role-badge '+(isCoach()?'julian':'marjana');
-    badge.textContent=isCoach()?'Coach':'Cliente';
+    badge.textContent=isCoach()?'Coach Admin':'Cliente';
     psub.after(badge);
   }
 }
