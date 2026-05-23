@@ -18,11 +18,13 @@
 }
 html,body{height:100%;background:var(--bg-base);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;color:var(--t);overflow:hidden;-webkit-font-smoothing:antialiased}
 
-/* AMBIENT GLOW */
-body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 130% 50% at 50% -8%,rgba(90,55,10,.75) 0%,transparent 60%)}
+/* AMBIENT GLOW — sombre, disparaît quand l'app est ouverte */
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 130% 50% at 50% -8%,rgba(90,55,10,.75) 0%,transparent 60%);transition:opacity .9s ease}
+body.app-on::before{opacity:0}
 
-/* CANVAS */
-#cv{position:fixed;inset:0;z-index:0;pointer-events:none}
+/* CANVAS — disparaît aussi */
+#cv{position:fixed;inset:0;z-index:0;pointer-events:none;transition:opacity .9s ease}
+body.app-on #cv{opacity:0}
 
 /* ─── SPLASH ─── */
 #splash{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#020100;cursor:pointer;transition:opacity .7s cubic-bezier(.4,0,.2,1),transform .7s cubic-bezier(.4,0,.2,1);will-change:opacity,transform}
@@ -50,8 +52,71 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 
 /* APP */
-#app{height:100%;flex-direction:column;position:relative;z-index:1;display:flex;opacity:0;pointer-events:none;transform:scale(.985);transition:opacity .6s .06s cubic-bezier(.25,.8,.25,1),transform .6s .06s cubic-bezier(.25,.8,.25,1)}
+#app{height:100%;flex-direction:column;position:relative;z-index:1;display:flex;opacity:0;pointer-events:none;transform:scale(.985);transition:opacity .75s .05s cubic-bezier(.25,.8,.25,1),transform .75s .05s cubic-bezier(.22,.8,.25,1)}
 #app.on{opacity:1;pointer-events:auto;transform:scale(1)}
+
+/* ══════════════════════════════════════════════
+   LIGHT THEME — dashboard premium (après login)
+══════════════════════════════════════════════ */
+#app{
+  --t:#111111;
+  --t2:rgba(17,17,17,.5);
+  --t3:rgba(17,17,17,.27);
+  --b:rgba(17,17,17,.07);
+  --bg:rgba(200,150,15,.2);
+  --s1:#FFFFFF;
+  --s2:rgba(0,0,0,.04);
+  --g:#9A7209;
+  --g2:#E9B949;
+  --g-dim:rgba(233,185,73,.12);
+  --g-glow:rgba(233,185,73,.22);
+  --green:#2DB55D;
+  --green-d:rgba(45,181,93,.08);
+  --bg-base:#F7F7F5;
+  background:#F7F7F5;
+}
+/* Lueur dorée douce en haut */
+#app::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 150% 28% at 50% -6%,rgba(244,197,66,.1) 0%,transparent 55%)}
+/* Navbar lumineuse */
+#app .nb{background:rgba(247,247,245,.9);border-bottom-color:rgba(17,17,17,.06);backdrop-filter:blur(40px)}
+/* Session overlay clair */
+#app #s-session{background:#F7F7F5}
+/* Tabbar blanc */
+#app .tabbar{background:rgba(255,255,255,.93);border-top-color:rgba(17,17,17,.07)}
+/* Métriques sur blanc */
+#app .metrics{background:#FFFFFF}
+/* Cartes avec ombre douce */
+#app .next-card{box-shadow:0 2px 20px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04)}
+#app .prog-tile{box-shadow:0 2px 20px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04)}
+/* Phase */
+#app .ph-head:active{background:rgba(0,0,0,.03)}
+#app .ph-n{color:rgba(17,17,17,.18)}
+#app .ph-card.open .ph-n{color:var(--g)}
+/* Objectifs */
+#app .obj-dot{border-color:rgba(17,17,17,.18)}
+#app .obj-row.done .obj-dot{background:var(--g2);border-color:var(--g2);box-shadow:0 0 8px rgba(233,185,73,.4);color:#5A3A00}
+/* Set buttons */
+#app .set-btn{background:#F0F0EE;border-color:rgba(17,17,17,.1);color:rgba(17,17,17,.38)}
+#app .set-btn.on{background:var(--g2);border-color:var(--g2);color:#5A3A00;box-shadow:0 0 14px rgba(233,185,73,.38)}
+/* Séances */
+#app .sess-check{border-color:rgba(17,17,17,.18)}
+#app .sess-row.done .sess-check{background:var(--g2);border-color:var(--g2);color:#5A3A00;box-shadow:0 0 10px rgba(233,185,73,.28)}
+#app .done-dot{border-color:rgba(17,17,17,.18)}
+/* Maîtrise */
+#app .mait-btn{color:rgba(17,17,17,.28)}
+#app .mait-btn.on{color:var(--g)}
+/* Tab bar */
+#app .tab-dot{background:rgba(17,17,17,.18)}
+#app .tab.on .tab-dot{background:var(--g2);box-shadow:0 0 8px rgba(233,185,73,.55)}
+#app .tab-lbl{color:rgba(17,17,17,.35)}
+#app .tab.on .tab-lbl{color:var(--g)}
+/* Labels section */
+#app .sect-lbl{color:rgba(17,17,17,.3)}
+/* Coach */
+#app .coach-title{color:var(--g)}
+#app .coach-block{border-bottom-color:rgba(17,17,17,.07)}
+/* Mission */
+#app .miss-banner{background:rgba(233,185,73,.07);border-bottom-color:rgba(17,17,17,.07)}
 
 /* SCREENS WRAP — all screens stack here */
 .sw{flex:1;position:relative;overflow:hidden}
@@ -84,19 +149,17 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .sc::-webkit-scrollbar{display:none}
 
 /* HERO */
-.hero{padding:28px 22px 26px;border-bottom:1px solid var(--b)}
-.hero-top{display:flex;align-items:center;gap:14px;margin-bottom:24px}
-.hero-av{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,rgba(212,175,110,.18),rgba(212,175,110,.06));border:1px solid rgba(212,175,110,.28);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--g);letter-spacing:.04em;flex-shrink:0}
-.hero-info{display:flex;flex-direction:column;gap:3px}
-.hero-tag{font-size:9px;font-weight:700;letter-spacing:.28em;color:var(--g);text-transform:uppercase}
-.hero-brand{font-size:11px;color:var(--t2);letter-spacing:.06em}
-.hero-name{font-size:40px;font-weight:100;letter-spacing:.01em;line-height:1.02;margin-bottom:10px;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif}
-.hero-name strong{display:block;font-weight:600;color:var(--t)}
-.hero-date{font-size:11px;color:var(--t2);letter-spacing:.05em;margin-bottom:20px}
-.hero-date b{color:var(--t);font-weight:500}
+.hero{padding:26px 22px 22px;border-bottom:1px solid var(--b)}
+.hero-greet{font-size:27px;font-weight:300;color:var(--t);letter-spacing:-.3px;line-height:1.18;margin-bottom:5px;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif}
+.hero-tagline{font-size:13px;color:var(--t2);margin-bottom:22px;letter-spacing:.01em}
+.hero-profile{display:flex;align-items:center;gap:13px;background:var(--s1);border:1px solid var(--b);border-radius:16px;padding:14px 16px;margin-bottom:18px;box-shadow:0 1px 14px rgba(0,0,0,.06),0 0 0 .5px rgba(0,0,0,.03)}
+.hero-av{width:42px;height:42px;border-radius:50%;background:var(--g-dim);border:1.5px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--g);letter-spacing:.03em;flex-shrink:0}
+.hero-pinfo{flex:1;min-width:0}
+.hero-pname{font-size:14px;font-weight:600;color:var(--t);margin-bottom:2px}
+.hero-psub{font-size:11px;color:var(--t2);letter-spacing:.02em}
 .hero-links{display:flex;gap:9px;flex-wrap:wrap}
-.hero-link{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g);text-decoration:none;background:rgba(212,175,110,.09);border:1px solid rgba(212,175,110,.22);border-radius:20px;padding:7px 15px;transition:all .22s cubic-bezier(.2,.8,.3,1)}
-.hero-link:active{background:rgba(212,175,110,.18);transform:scale(.97)}
+.hero-link{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g);text-decoration:none;background:var(--g-dim);border:1px solid var(--bg);border-radius:20px;padding:7px 15px;transition:all .22s cubic-bezier(.2,.8,.3,1)}
+.hero-link:active{opacity:.7;transform:scale(.97)}
 
 /* METRICS */
 .metrics{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--b);flex-shrink:0;background:rgba(255,255,255,.02)}
@@ -267,15 +330,15 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
       <div class="nb"><div class="nb-mark">P+</div><div class="nb-sp"></div></div>
       <div class="sc">
         <div class="hero">
-          <div class="hero-top">
+          <div class="hero-greet" id="h-greet">Bonjour Marjana ☀️</div>
+          <div class="hero-tagline" id="h-tagline">Prête à attaquer la journée ? 💪</div>
+          <div class="hero-profile">
             <div class="hero-av">MH</div>
-            <div class="hero-info">
-              <div class="hero-tag">Coaching Personnalisé</div>
-              <div class="hero-brand">Performance Plus</div>
+            <div class="hero-pinfo">
+              <div class="hero-pname">Marjana Houloud</div>
+              <div class="hero-psub">Performance Plus · Programme débuté le 25 mai 2026</div>
             </div>
           </div>
-          <div class="hero-name">Marjana<br><strong>Houloud</strong></div>
-          <div class="hero-date">Programme débuté le <b>25 mai 2026</b></div>
           <div class="hero-links">
             <a class="hero-link" href="https://docs.google.com/document/d/1tys6hyZD2eY9rp23McWszw6R8ftYqXvXE8Pan1GedlA/edit?tab=t.0" target="_blank">↗ Contrat</a>
             <a class="hero-link" href="https://youtu.be/I-ZyNX-SFTo" target="_blank">↗ Programme vidéo</a>
@@ -458,10 +521,18 @@ function login(){
     buildAll();
     setTimeout(()=>{
       auth.style.display='none';
+      // Activer le thème clair + cacher canvas/glow
+      document.body.classList.add('app-on');
       requestAnimationFrame(()=>requestAnimationFrame(()=>{
         document.getElementById('app').classList.add('on');
+        // Bloom cinématographique : flash blanc qui se dissout
+        const bloom=document.createElement('div');
+        bloom.style.cssText='position:fixed;inset:0;z-index:50;background:#fff;opacity:.35;pointer-events:none;transition:opacity .7s ease';
+        document.body.appendChild(bloom);
+        requestAnimationFrame(()=>{bloom.style.opacity='0';});
+        setTimeout(()=>bloom.remove(),800);
       }));
-    },360);
+    },340);
   } else {
     const e=document.getElementById('a-err');
     e.textContent='Accès refusé.';
@@ -505,8 +576,25 @@ function goTab(id){
   if(id==='seances')buildProgGrid();
 }
 
+/* GREETING */
+function getGreeting(){
+  const h=new Date().getHours();
+  if(h>=5&&h<12)  return['Bonjour Marjana ☀️','Prête à attaquer la journée ? 💪'];
+  if(h>=12&&h<14) return['Bon appétit Marjana 🌟','Recharge bien, la suite t\'attend ⚡'];
+  if(h>=14&&h<18) return['Bel après-midi Marjana ✨','Continue comme ça, tu avances 🔥'];
+  if(h>=18&&h<22) return['Bonsoir Marjana 🌙','Belle progression cette semaine ✨'];
+  return['Bonsoir Marjana 🌙','Repose-toi, demain on repart 💤'];
+}
+function buildGreeting(){
+  const[greet,tagline]=getGreeting();
+  const g=document.getElementById('h-greet');
+  const t=document.getElementById('h-tagline');
+  if(g)g.textContent=greet;
+  if(t)t.textContent=tagline;
+}
+
 function buildAll(){
-  buildRoadmap();buildHomeRM();buildHomeNext();updateStats();buildProgGrid();
+  buildGreeting();buildRoadmap();buildHomeRM();buildHomeNext();updateStats();buildProgGrid();
 }
 
 /* STATS */
