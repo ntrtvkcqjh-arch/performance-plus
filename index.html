@@ -1124,19 +1124,16 @@ function openEditSession(){
   const exs=custom||sess.exercises;
   const ns=NS[pid];
   const cont=document.getElementById('edit-cont');
-  cont.innerHTML=exs.map((ex,i)=>{
-    if(!ex)return`<div class="edit-card" style="opacity:.4"><div class="edit-idx">Exercice ${i+1}</div><div style="font-size:13px;color:rgba(17,17,17,.35)">Non encore défini par le coach</div></div>`;
-    return`<div class="edit-card">
+  cont.innerHTML=exs.map((ex,i)=>`<div class="edit-card">
 <div class="edit-idx">Exercice ${i+1}</div>
-<input class="edit-field" data-i="${i}" data-f="name" value="${esc(ex.name||'')}" placeholder="Nom de l'exercice"/>
+<input class="edit-field" data-i="${i}" data-f="name" value="${esc(ex?.name||'')}" placeholder="Nom de l'exercice"/>
 <div class="edit-row">
-  <input class="edit-field" data-i="${i}" data-f="series" value="${esc(ex.series||'')}" placeholder="Séries"/>
-  <input class="edit-field" data-i="${i}" data-f="reps" value="${esc(ex.reps||'')}" placeholder="Reps / Temps"/>
+  <input class="edit-field" data-i="${i}" data-f="series" value="${esc(ex?.series||'')}" placeholder="Séries"/>
+  <input class="edit-field" data-i="${i}" data-f="reps" value="${esc(ex?.reps||'')}" placeholder="Reps / Temps"/>
 </div>
-<input class="edit-field" data-i="${i}" data-f="note" value="${esc(ex.note||'')}" placeholder="Note coach (optionnel)"/>
-<input class="edit-field" data-i="${i}" data-f="video" value="${esc(ex.video||'')}" placeholder="Lien vidéo (optionnel)"/>
-</div>`;
-  }).join('');
+<input class="edit-field" data-i="${i}" data-f="note" value="${esc(ex?.note||'')}" placeholder="Note (optionnel)"/>
+<input class="edit-field" data-i="${i}" data-f="video" value="${esc(ex?.video||'')}" placeholder="Lien vidéo (optionnel)"/>
+</div>`).join('');
   document.getElementById('edit-overlay').classList.add('on');
 }
 function closeEditSession(){document.getElementById('edit-overlay')?.classList.remove('on');}
