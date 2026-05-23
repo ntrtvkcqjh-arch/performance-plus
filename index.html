@@ -998,8 +998,14 @@ body.coach-mode .chat-send:not(:disabled){background:#1A56CC;color:#fff}
 })();
 
 /* DATA */
-const PWD_M='perf2026';
-const PWD_J='julian2026';
+/* Auth — emails internes (jamais montrés à l'utilisateur, mdp validés côté serveur) */
+const _MAIL_M='marjana@performance-plus.app';
+const _MAIL_J='julian@performance-plus.app';
+function _emailToRole(email){
+  if(email===_MAIL_J)return'julian';
+  if(email===_MAIL_M)return'marjana';
+  return null;
+}
 let _role=null;
 const isCoach=()=>_role==='julian';
 const PHASES=[
@@ -1104,17 +1110,19 @@ function _enterApp(){
     document.getElementById('app').classList.add('on');
   }));
 }
-function showAuth(){
+async function showAuth(){
   if(splashDone)return;
   splashDone=true;
   document.getElementById('splash').classList.add('gone');
-  // Restauration de session après actualisation
-  const saved=localStorage.getItem('pp_role');
-  if(saved==='marjana'||saved==='julian'){
-    _role=saved;
-    setTimeout(_enterApp,320);
-    return;
-  }
+  /* Vérifier la session Supabase (persistée automatiquement par le SDK entre les rechargements) */
+  try{
+    const{data:{session}}=await _supa().auth.getSession();
+    if(session?.user?.email){
+      const r=_emailToRole(session.user.email);
+      if(r){_role=r;setTimeout(_enterApp,320);return;}
+    }
+  }catch(e){}
+  /* Aucune session → afficher la page de connexion */
   setTimeout(()=>{
     document.getElementById('auth').classList.add('on');
     document.getElementById('pwd').focus();
@@ -1139,41 +1147,46 @@ function selectProfile(profile){
   setTimeout(()=>inp.focus(),350);
 }
 
-function login(){
-  if(!_selectedProfile){showToast&&showToast('Choisissez une session');return;}
+async function login(){
+  if(!_selectedProfile){showToast('Choisissez une session');return;}
   const inp=document.getElementById('pwd');
-  const val=inp.value;
-  const expected=_selectedProfile==='julian'?PWD_J:PWD_M;
-  if(val===expected){
-    _role=_selectedProfile;
-    localStorage.setItem('pp_role',_role);
-    if(isCoach())document.body.classList.add('coach-mode');
-    _applyRoleUI();
-    const auth=document.getElementById('auth');
-    auth.classList.add('off');
-    buildAll();
-    setTimeout(()=>{
-      auth.style.display='none';
-      document.body.classList.add('app-on');
-      requestAnimationFrame(()=>requestAnimationFrame(()=>{
-        document.getElementById('app').classList.add('on');
-        const bloom=document.createElement('div');
-        bloom.style.cssText='position:fixed;inset:0;z-index:50;background:#fff;opacity:.35;pointer-events:none;transition:opacity .7s ease';
-        document.body.appendChild(bloom);
-        requestAnimationFrame(()=>{bloom.style.opacity='0';});
-        setTimeout(()=>bloom.remove(),800);
-      }));
-    },340);
-  } else {
+  const val=inp.value;if(!val)return;
+  const email=_selectedProfile==='julian'?_MAIL_J:_MAIL_M;
+  /* Indicateur de chargement */
+  const lockBtn=document.querySelector('.lock-btn');
+  if(lockBtn){lockBtn.disabled=true;lockBtn.textContent='Connexion…';}
+  /* Authentification via Supabase — mot de passe validé côté serveur */
+  const{error}=await _supa().auth.signInWithPassword({email,password:val});
+  if(lockBtn){lockBtn.disabled=false;lockBtn.textContent='Déverrouiller →';}
+  if(error){
     const e=document.getElementById('a-err');
     e.textContent='Mot de passe incorrect.';
-    inp.classList.add('shake');
-    inp.value='';
+    inp.classList.add('shake');inp.value='';
     setTimeout(()=>{inp.classList.remove('shake');e.textContent='';},2500);
+    return;
   }
+  /* Connexion réussie */
+  _role=_selectedProfile;
+  if(isCoach())document.body.classList.add('coach-mode');
+  _applyRoleUI();
+  const auth=document.getElementById('auth');
+  auth.classList.add('off');
+  buildAll();
+  setTimeout(()=>{
+    auth.style.display='none';
+    document.body.classList.add('app-on');
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      document.getElementById('app').classList.add('on');
+      const bloom=document.createElement('div');
+      bloom.style.cssText='position:fixed;inset:0;z-index:50;background:#fff;opacity:.35;pointer-events:none;transition:opacity .7s ease';
+      document.body.appendChild(bloom);
+      requestAnimationFrame(()=>{bloom.style.opacity='0';});
+      setTimeout(()=>bloom.remove(),800);
+    }));
+  },340);
 }
-function logout(){
-  localStorage.removeItem('pp_role');
+async function logout(){
+  try{await _supa().auth.signOut();}catch(e){}
   location.reload();
 }
 
