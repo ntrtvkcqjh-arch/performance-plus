@@ -36,19 +36,34 @@ body.app-on #cv{opacity:0}
 .sp-hint{position:absolute;bottom:max(env(safe-area-inset-bottom,0px),40px);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);opacity:0;animation:fadeUp .55s 1.9s ease both,blink 2.4s 2.5s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:.25}50%{opacity:.65}}
 
-/* ─── AUTH (iPhone lock) ─── */
-#auth{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 32px;opacity:0;pointer-events:none;transform:translateY(30px);transition:opacity .52s cubic-bezier(.25,.8,.25,1),transform .52s cubic-bezier(.25,.8,.25,1);will-change:opacity,transform}
+/* ─── AUTH ─── */
+#auth{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 28px;opacity:0;pointer-events:none;transform:translateY(30px);transition:opacity .52s cubic-bezier(.25,.8,.25,1),transform .52s cubic-bezier(.25,.8,.25,1);will-change:opacity,transform;gap:0}
 #auth.on{opacity:1;pointer-events:auto;transform:translateY(0)}
 #auth.off{opacity:0;transform:scale(.96) translateY(-18px);transition-duration:.38s}
-.lock-name{font-size:clamp(40px,11vw,58px);font-weight:100;letter-spacing:.03em;text-align:center;line-height:1.05;margin-bottom:52px;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;color:var(--t)}
-.lock-card{width:100%;max-width:298px;background:rgba(252,249,245,.97);border-radius:24px;padding:28px 22px 24px;box-shadow:0 28px 90px rgba(0,0,0,.75),0 0 0 .5px rgba(255,255,255,.12)}
-.lock-inp{width:100%;background:rgba(0,0,0,.07);border:none;border-radius:13px;outline:none;padding:15px 16px;font-size:16px;color:#100e0b;letter-spacing:.24em;text-align:center;font-family:inherit;margin-bottom:11px;display:block;-webkit-appearance:none;transition:background .2s}
+/* titre */
+.auth-ttl{font-size:clamp(34px,9vw,50px);font-weight:100;letter-spacing:.04em;text-align:center;margin-bottom:10px;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;color:var(--t)}
+.auth-sub{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);margin-bottom:44px;text-align:center}
+/* cartes de sélection de profil */
+.auth-profiles{display:flex;gap:14px;width:100%;max-width:310px;margin-bottom:28px}
+.auth-profile{flex:1;background:rgba(252,249,245,.07);border:1.5px solid rgba(255,255,255,.09);border-radius:22px;padding:22px 12px 18px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .25s cubic-bezier(.25,.8,.25,1);-webkit-tap-highlight-color:transparent}
+.auth-profile.sel{background:rgba(252,249,245,.14);border-color:var(--g);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.auth-profile:active{transform:scale(.96)}
+.ap-av{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;margin-bottom:6px;transition:all .25s}
+.ap-av.m{background:rgba(212,175,110,.18);border:1.5px solid rgba(212,175,110,.3);color:var(--g)}
+.ap-av.j{background:rgba(74,144,226,.16);border:1.5px solid rgba(74,144,226,.32);color:#7BB8F5}
+.ap-name{font-size:14px;font-weight:600;color:var(--t);letter-spacing:.02em}
+.ap-role{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3)}
+/* carte mot de passe */
+.lock-card{width:100%;max-width:310px;background:rgba(252,249,245,.97);border-radius:24px;padding:24px 20px 20px;box-shadow:0 28px 90px rgba(0,0,0,.75),0 0 0 .5px rgba(255,255,255,.12);overflow:hidden;max-height:0;opacity:0;transition:max-height .4s cubic-bezier(.25,.8,.25,1),opacity .3s ease,padding .4s}
+.lock-card.show{max-height:200px;opacity:1}
+.lock-who{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;text-align:center;margin-bottom:14px;color:rgba(16,14,11,.42)}
+.lock-inp{width:100%;background:rgba(0,0,0,.07);border:none;border-radius:13px;outline:none;padding:14px 16px;font-size:16px;color:#100e0b;letter-spacing:.24em;text-align:center;font-family:inherit;margin-bottom:10px;display:block;-webkit-appearance:none;transition:background .2s}
 .lock-inp:focus{background:rgba(0,0,0,.1)}
 .lock-inp::placeholder{color:rgba(16,14,11,.28);letter-spacing:.07em;font-size:13px}
 .lock-inp.shake{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
-.lock-btn{display:block;width:100%;background:#100e0b;border:none;border-radius:13px;padding:15px;font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--g);cursor:pointer;font-family:inherit;transition:opacity .15s,transform .15s}
+.lock-btn{display:block;width:100%;background:#100e0b;border:none;border-radius:13px;padding:14px;font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--g);cursor:pointer;font-family:inherit;transition:opacity .15s,transform .15s}
 .lock-btn:active{opacity:.72;transform:scale(.98)}
-.a-err{margin-top:16px;font-size:11px;letter-spacing:.07em;color:rgba(228,75,55,.85);text-align:center;min-height:16px}
+.a-err{margin-top:14px;font-size:11px;letter-spacing:.07em;color:rgba(228,75,55,.85);text-align:center;min-height:16px}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 
 /* APP */
@@ -534,8 +549,22 @@ body.coach-mode .coach-only-flex{display:flex!important}
 
 <!-- AUTH (iPhone lock) -->
 <div id="auth">
-  <div class="lock-name" id="lock-name">Performance+</div>
-  <div class="lock-card">
+  <div class="auth-ttl">Performance+</div>
+  <div class="auth-sub">Choisissez votre session</div>
+  <div class="auth-profiles">
+    <div class="auth-profile" id="ap-marjana" onclick="selectProfile('marjana')">
+      <div class="ap-av m">M</div>
+      <div class="ap-name">Marjana</div>
+      <div class="ap-role">Cliente</div>
+    </div>
+    <div class="auth-profile" id="ap-julian" onclick="selectProfile('julian')">
+      <div class="ap-av j">J</div>
+      <div class="ap-name">Julian</div>
+      <div class="ap-role">Coach</div>
+    </div>
+  </div>
+  <div class="lock-card" id="lock-card">
+    <div class="lock-who" id="lock-who"></div>
     <input id="pwd" class="lock-inp" type="password" placeholder="mot de passe" autocomplete="current-password"/>
     <button class="lock-btn" onclick="login()">Déverrouiller →</button>
   </div>
@@ -844,14 +873,29 @@ setTimeout(showAuth,2800);
 document.getElementById('splash').addEventListener('click',showAuth);
 
 document.getElementById('pwd').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+
+let _selectedProfile=null;
+function selectProfile(profile){
+  _selectedProfile=profile;
+  document.getElementById('ap-marjana').classList.toggle('sel',profile==='marjana');
+  document.getElementById('ap-julian').classList.toggle('sel',profile==='julian');
+  const card=document.getElementById('lock-card');
+  const who=document.getElementById('lock-who');
+  const inp=document.getElementById('pwd');
+  who.textContent=profile==='julian'?'Session Coach — Julian':'Session Cliente — Marjana';
+  card.classList.add('show');
+  inp.value='';
+  setTimeout(()=>inp.focus(),350);
+}
+
 function login(){
+  if(!_selectedProfile){showToast&&showToast('Choisissez une session');return;}
   const inp=document.getElementById('pwd');
   const val=inp.value;
-  if(val===PWD_M||val===PWD_J){
-    _role=val===PWD_J?'julian':'marjana';
-    // Appliquer le mode coach si Julian
+  const expected=_selectedProfile==='julian'?PWD_J:PWD_M;
+  if(val===expected){
+    _role=_selectedProfile;
     if(isCoach())document.body.classList.add('coach-mode');
-    // Mettre à jour l'accueil selon le rôle
     _applyRoleUI();
     const auth=document.getElementById('auth');
     auth.classList.add('off');
@@ -870,7 +914,7 @@ function login(){
     },340);
   } else {
     const e=document.getElementById('a-err');
-    e.textContent='Accès refusé.';
+    e.textContent='Mot de passe incorrect.';
     inp.classList.add('shake');
     inp.value='';
     setTimeout(()=>{inp.classList.remove('shake');e.textContent='';},2500);
