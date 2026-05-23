@@ -779,7 +779,27 @@ function buildGreeting(){
   if(t)t.textContent=tagline;
 }
 
+/* ── HELPER : custom exercises (ignore all-null saves) ── */
+function getEffectiveEx(sess,sessId){
+  const raw=ls('pp_custom_'+sessId);
+  if(!raw)return sess.exercises;
+  const custom=JSON.parse(raw);
+  // If every slot is null (old empty save before real data existed), ignore it
+  if(!Array.isArray(custom)||!custom.some(e=>e&&e.name))return sess.exercises;
+  return custom;
+}
+
+/* ── Supprime les clés custom corrompues (tout null) au démarrage ── */
+function cleanStaleCustom(){
+  Object.values(SESSIONS).forEach(prog=>prog.sessions.forEach(sess=>{
+    const k='pp_custom_'+sess.id;const raw=ls(k);
+    if(!raw)return;
+    try{const d=JSON.parse(raw);if(Array.isArray(d)&&!d.some(e=>e&&e.name))localStorage.removeItem(k);}catch(e){}
+  }));
+}
+
 function buildAll(){
+  cleanStaleCustom();
   buildGreeting();buildRoadmap();buildHomeRM();buildHomeNext();updateStats();buildProgGrid();buildCoach();startClock();
 }
 
@@ -996,9 +1016,7 @@ function openSession(pid,sessId){
   const mw=document.getElementById('miss-wrap');
   if(sess.mission){mw.style.display='block';tx('miss-txt',sess.mission);}else mw.style.display='none';
   refreshDone(sessId);
-  // Use custom exercises if saved
-  const custom=JSON.parse(ls('pp_custom_'+sessId)||'null');
-  const sessWithCustom=custom?{...sess,exercises:custom}:sess;
+  const sessWithCustom={...sess,exercises:getEffectiveEx(sess,sessId)};
   buildEx(pid,sessWithCustom);
   buildCommMain(pid,sess);
   requestAnimationFrame(()=>{
@@ -1061,8 +1079,7 @@ function toggleSet(sessId,exIdx,si,ns,btn){
   if(sets[si]&&curSess){
     const{pid}=curSess;
     const sess=SESSIONS[pid].sessions.find(s=>s.id===sessId);
-    const custom=JSON.parse(ls('pp_custom_'+sessId)||'null');
-    const exs=custom||sess?.exercises||[];
+    const exs=sess?getEffectiveEx(sess,sessId):[];
     const ex=exs[exIdx];
     startRestTimer(getRestSecs(ex?.note||''));
     checkAllSets(pid,{id:sessId,exercises:exs},ns);
@@ -1222,8 +1239,7 @@ async function openAI(pid,sid){
 
   // Gather context
   const sess=SESSIONS[pid].sessions.find(s=>s.id===sid);
-  const custom=JSON.parse(ls('pp_custom_'+sid)||'null');
-  const exs=(custom||sess?.exercises||[]).filter(e=>e);
+  const exs=getEffectiveEx(sess,sid).filter(e=>e);
   const enriched=exs.map((ex,i)=>{
     const sets=JSON.parse(ls('pp_sets_'+sid+'_'+i)||'[]');
     return{...ex,setsCompleted:sets.filter(Boolean).length};
@@ -1273,8 +1289,7 @@ function openEditSession(){
   const{pid,sessId}=curSess;
   const sess=SESSIONS[pid].sessions.find(s=>s.id===sessId);
   if(!sess)return;
-  const custom=JSON.parse(ls('pp_custom_'+sessId)||'null');
-  const exs=custom||sess.exercises;
+  const exs=getEffectiveEx(sess,sessId);
   const ns=NS[pid];
   const cont=document.getElementById('edit-cont');
   cont.innerHTML=exs.map((ex,i)=>`<div class="edit-card">
