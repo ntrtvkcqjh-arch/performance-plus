@@ -99,10 +99,8 @@ body.app-on #cv{opacity:0}
 #app #s-session{background:#F7F7F5}
 /* Tabbar blanc */
 #app .tabbar{background:rgba(255,255,255,.93);border-top-color:rgba(17,17,17,.07)}
-/* Métriques sur blanc */
-#app .metrics{background:#FFFFFF}
-/* Cartes avec ombre douce */
-#app .next-card{box-shadow:0 2px 20px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04)}
+/* ── Widget cards ombre douce ── */
+#app .wdg{box-shadow:0 1px 18px rgba(0,0,0,.07),0 0 0 .5px rgba(0,0,0,.04)}
 #app .prog-tile{box-shadow:0 2px 20px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04)}
 /* Phase */
 #app .ph-head:active{background:rgba(0,0,0,.03)}
@@ -133,6 +131,59 @@ body.app-on #cv{opacity:0}
 #app .coach-block{border-bottom-color:rgba(17,17,17,.07)}
 /* Mission */
 #app .miss-banner{background:rgba(233,185,73,.07);border-bottom-color:rgba(17,17,17,.07)}
+
+/* ══════════════════════════════════════════════
+   HOME SCREEN — Widget layout style Apple
+══════════════════════════════════════════════ */
+.home-hero{padding:38px 22px 26px;text-align:center;background:transparent}
+.home-clock-big{font-size:clamp(78px,24vw,108px);font-weight:100;letter-spacing:-.04em;line-height:1;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;font-variant-numeric:tabular-nums;color:var(--t);margin-bottom:2px}
+.home-col-sep{color:var(--g2);font-weight:200;animation:colonBlink 1s step-start infinite}
+.home-clock-secondary{font-size:13px;color:var(--t2);letter-spacing:.07em;margin-bottom:22px;font-variant-numeric:tabular-nums}
+.home-greet{font-size:23px;font-weight:300;color:var(--t);letter-spacing:-.2px;line-height:1.2;margin-bottom:5px;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif}
+.home-tagline{font-size:13px;color:var(--t2);letter-spacing:.01em}
+/* Widget container */
+.home-widgets{padding:20px 16px 48px;display:flex;flex-direction:column;gap:13px}
+/* Base widget */
+.wdg{background:#FFFFFF;border-radius:22px;position:relative;overflow:hidden;transition:transform .16s cubic-bezier(.2,.8,.3,1)}
+.wdg:active{transform:scale(.975)}
+.wdg-row{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+/* Stat widgets */
+.wdg-stat{padding:20px 18px 18px;display:flex;flex-direction:column;min-height:116px;cursor:default}
+.wdg-stat-ic{font-size:20px;margin-bottom:auto;padding-bottom:10px}
+.wdg-stat-val{font-size:30px;font-weight:200;letter-spacing:-.6px;line-height:1;margin-bottom:5px;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;font-variant-numeric:tabular-nums}
+.wdg-stat-lbl{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--t2)}
+/* Next workout — dark feature card */
+.wdg-next-card{background:linear-gradient(140deg,#111111 0%,#1E1A13 100%);border-radius:22px;padding:22px 56px 22px 22px;box-shadow:0 6px 32px rgba(0,0,0,.18),0 0 0 .5px rgba(0,0,0,.22);cursor:pointer;position:relative;overflow:hidden;transition:transform .16s cubic-bezier(.2,.8,.3,1)}
+.wdg-next-card:active{transform:scale(.975)}
+.wdg-next-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 10% 50%,rgba(233,185,73,.14) 0%,transparent 70%);pointer-events:none}
+.wdg-next-eyebrow{font-size:9px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--g2);opacity:.7;margin-bottom:10px}
+.wdg-next-name{font-size:17px;font-weight:500;color:#FAF7F2;letter-spacing:-.1px;margin-bottom:5px;line-height:1.3}
+.wdg-next-meta{font-size:12px;color:rgba(250,247,242,.42);letter-spacing:.03em}
+.wdg-next-arr{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:26px;color:var(--g2);font-weight:100;line-height:1;opacity:.9}
+.wdg-next-empty{background:#FFFFFF;border-radius:22px;padding:22px;text-align:center;font-size:13px;color:var(--green);font-weight:600;box-shadow:0 1px 18px rgba(0,0,0,.07)}
+/* Roadmap widget */
+.wdg-roadmap-inner{padding:18px 20px}
+.wdg-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.wdg-title{font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--t2)}
+.wdg-title-right{font-size:11px;font-weight:700;color:var(--g);font-variant-numeric:tabular-nums}
+.wdg .ph-mini{margin-bottom:11px}
+.wdg .ph-mini:last-child{margin-bottom:0}
+.wdg .ph-mini-track{height:3px;border-radius:99px}
+.wdg .ph-mini-fill{height:100%;border-radius:99px}
+/* Quick link widgets */
+.wdg-link{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-decoration:none;padding:22px 14px;min-height:108px;text-align:center}
+.wdg-link-ic{font-size:30px}
+.wdg-link-lbl{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t2);line-height:1.3}
+.wdg-link-tag{position:absolute;top:12px;right:14px;font-size:9px;font-weight:700;color:var(--g);letter-spacing:.06em}
+/* Profile widget */
+.wdg-profile{padding:16px 18px;display:flex;align-items:center;gap:13px}
+/* Coach mode home overrides */
+body.coach-mode .home-greet{background:linear-gradient(90deg,#1A56CC,#3B82F6);-webkit-background-clip:text;background-clip:text;color:transparent}
+body.coach-mode .home-hero{background:linear-gradient(170deg,#EAF0FD 0%,#F2F5FB 70%)}
+body.coach-mode .wdg-next-card{background:linear-gradient(140deg,#1D3461 0%,#163055 100%)}
+body.coach-mode .wdg-next-card::before{background:radial-gradient(ellipse 70% 60% at 10% 50%,rgba(59,130,246,.2) 0%,transparent 70%)}
+body.coach-mode .wdg-next-arr{color:#60A5FA}
+body.coach-mode .wdg-next-eyebrow{color:#60A5FA}
 
 /* SCREENS WRAP — all screens stack here */
 .sw{flex:1;position:relative;overflow:hidden}
@@ -626,17 +677,55 @@ body.coach-mode .comm-av,body.coach-mode .ex-comm-av{background:rgba(59,130,246,
     <div class="screen on" id="s-home">
       <div class="nb"><div class="nb-mark">P+</div><div class="nb-sp"></div></div>
       <div class="sc">
-        <div class="hero">
-          <div class="hero-clock">
-            <div class="clock-time"><span id="ck-h">00</span><span class="clock-colon">:</span><span id="ck-m">00</span></div>
-            <div class="clock-right">
-              <div class="clock-secs" id="ck-s">00</div>
-              <div class="clock-date" id="ck-d">—</div>
+        <!-- Horloge centrée -->
+        <div class="home-hero">
+          <div class="home-clock-big"><span id="ck-h">00</span><span class="home-col-sep">:</span><span id="ck-m">00</span></div>
+          <div class="home-clock-secondary"><span id="ck-s">00</span> &middot; <span id="ck-d">—</span></div>
+          <div class="home-greet" id="h-greet">Bonjour Marjana ☀️</div>
+          <div class="home-tagline" id="h-tagline">Prête à attaquer la journée ? 💪</div>
+        </div>
+        <!-- Widgets -->
+        <div class="home-widgets">
+          <!-- Stats -->
+          <div class="wdg-row">
+            <div class="wdg wdg-stat">
+              <div class="wdg-stat-ic">🎯</div>
+              <div class="wdg-stat-val" id="st-obj" style="color:var(--g)">0/20</div>
+              <div class="wdg-stat-lbl">Objectifs</div>
+            </div>
+            <div class="wdg wdg-stat">
+              <div class="wdg-stat-ic">🏅</div>
+              <div class="wdg-stat-val" id="st-sess" style="color:var(--green)">0/9</div>
+              <div class="wdg-stat-lbl">Séances</div>
             </div>
           </div>
-          <div class="hero-greet" id="h-greet">Bonjour Marjana ☀️</div>
-          <div class="hero-tagline" id="h-tagline">Prête à attaquer la journée ? 💪</div>
-          <div class="hero-profile">
+          <!-- Prochaine séance (généré en JS) -->
+          <div id="h-next"></div>
+          <!-- Roadmap -->
+          <div class="wdg">
+            <div class="wdg-roadmap-inner">
+              <div class="wdg-header">
+                <div class="wdg-title">Roadmap</div>
+                <div class="wdg-title-right" id="st-pct">0%</div>
+              </div>
+              <div id="h-roadmap"></div>
+            </div>
+          </div>
+          <!-- Liens rapides -->
+          <div class="wdg-row">
+            <a class="wdg wdg-link" href="https://docs.google.com/document/d/1tys6hyZD2eY9rp23McWszw6R8ftYqXvXE8Pan1GedlA/edit?tab=t.0" target="_blank">
+              <div class="wdg-link-tag">↗</div>
+              <div class="wdg-link-ic">📄</div>
+              <div class="wdg-link-lbl">Contrat</div>
+            </a>
+            <a class="wdg wdg-link" href="https://youtu.be/I-ZyNX-SFTo" target="_blank">
+              <div class="wdg-link-tag">↗</div>
+              <div class="wdg-link-ic">🎥</div>
+              <div class="wdg-link-lbl">Programme vidéo</div>
+            </a>
+          </div>
+          <!-- Profil + déconnexion -->
+          <div class="wdg wdg-profile">
             <div class="hero-av">M</div>
             <div class="hero-pinfo">
               <div class="hero-pname">Marjana</div>
@@ -644,18 +733,7 @@ body.coach-mode .comm-av,body.coach-mode .ex-comm-av{background:rgba(59,130,246,
             </div>
             <button class="logout-btn" onclick="logout()">↩ Quitter</button>
           </div>
-          <div class="hero-links">
-            <a class="hero-link" href="https://docs.google.com/document/d/1tys6hyZD2eY9rp23McWszw6R8ftYqXvXE8Pan1GedlA/edit?tab=t.0" target="_blank">↗ Contrat</a>
-            <a class="hero-link" href="https://youtu.be/I-ZyNX-SFTo" target="_blank">↗ Programme vidéo</a>
-          </div>
         </div>
-        <div class="metrics">
-          <div class="met"><div class="met-v" id="st-obj" style="color:var(--g)">0/20</div><div class="met-l">Objectifs</div></div>
-          <div class="met"><div class="met-v" id="st-sess" style="color:var(--green)">0/9</div><div class="met-l">Séances</div></div>
-          <div class="met"><div class="met-v" id="st-pct">0%</div><div class="met-l">Complété</div></div>
-        </div>
-        <div class="sect"><div class="sect-lbl">Roadmap</div><div id="h-roadmap"></div></div>
-        <div class="sect"><div class="sect-lbl">Prochaine séance</div><div id="h-next"></div></div>
       </div>
     </div>
 
@@ -1225,17 +1303,23 @@ function buildHomeNext(){
   const el=document.getElementById('h-next');el.innerHTML='';
   for(const[pid,prog]of Object.entries(SESSIONS)){
     for(const sess of prog.sessions){
-      if(ls('pp_sess_'+sess.id)!=='1'){
-        const xc=sess.exercises.filter(e=>e).length;
-        const c=document.createElement('div');c.className='next-card';
-        c.onclick=()=>{goTab('seances');openProg(pid);openSession(pid,sess.id);};
-        const sLabel=sess.name&&sess.name!=='Séance '+sess.num?`Séance ${sess.num} · ${sess.name}`:`Séance ${sess.num}`;
-        c.innerHTML=`<div class="next-ic">${prog.icon}</div><div class="next-body"><div class="next-name">${prog.name} — ${sLabel}</div><div class="next-sub">${xc>0?xc+' exercice'+(xc>1?'s':''):'À venir'}</div></div><div class="next-arr">→</div>`;
-        el.appendChild(c);return;
-      }
+      if(ls('pp_sess_'+sess.id)==='1')continue;
+      const effEx=getEffectiveEx(sess,sess.id);
+      const hasEx=effEx.some(e=>e&&e.name);
+      if(!hasEx&&!isCoach())continue;
+      const xc=effEx.filter(e=>e&&e.name).length;
+      const sLabel=sess.name&&sess.name!=='Séance '+sess.num?`Séance ${sess.num} · ${sess.name}`:`Séance ${sess.num}`;
+      const meta=xc>0?xc+' exercice'+(xc>1?'s':''):(isCoach()?'Séance à définir':'Bientôt disponible');
+      const c=document.createElement('div');c.className='wdg-next-card';
+      c.onclick=()=>{goTab('seances');openProg(pid);if(hasEx||isCoach())openSession(pid,sess.id);};
+      c.innerHTML=`<div class="wdg-next-eyebrow">Prochaine séance</div>
+        <div class="wdg-next-name">${prog.icon} ${prog.name} &middot; ${sLabel}</div>
+        <div class="wdg-next-meta">${meta}</div>
+        <div class="wdg-next-arr">→</div>`;
+      el.appendChild(c);return;
     }
   }
-  el.innerHTML='<div style="padding:20px 0;font-size:11px;letter-spacing:.08em;color:var(--green)">Toutes les séances complétées.</div>';
+  el.innerHTML='<div class="wdg-next-empty">🎉 Toutes les séances complétées !</div>';
 }
 
 /* ROADMAP */
